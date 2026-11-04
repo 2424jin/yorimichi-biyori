@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3f7fb">
+    <meta name="description" content="季節イベントの概要、例年の開催時期、会場へのアクセスを確認できます。">
+    <title>イベント詳細 | よりみち日和</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+        color: #1c3446;
+        background: #f3f7fb;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        --ink: #1c3446;
+        --muted: #6b7f90;
+        --line: #dce6ed;
+        --blue: #176f89;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      @view-transition {
+        navigation: auto;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        background:
+          radial-gradient(ellipse at 12% 0, rgb(41 139 173 / 10%), transparent 34%),
+          linear-gradient(180deg, #f8fbfd, #eef4f8 58%, #f5f8fb);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a:focus-visible {
+        outline: 3px solid #2892ad;
+        outline-offset: 3px;
+      }
+
+      .topbar,
+      main,
+      footer {
+        width: min(100% - 40px, 1040px);
+        margin-inline: auto;
+      }
+
+      .topbar {
+        display: flex;
+        min-height: 72px;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #17364b;
+        font-size: 0.78rem;
+        font-weight: 850;
+        letter-spacing: 0.12em;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 31px;
+        height: 31px;
+        place-items: center;
+        border-radius: 10px;
+        color: #fff;
+        background: linear-gradient(145deg, #2485a0, #165676);
+      }
+
+      main {
+        padding-block: 34px 62px;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 40px;
+        padding: 8px 12px;
+        border: 1px solid #d5e2e9;
+        border-radius: 11px;
+        color: #315267;
+        background: #fff;
+        font-size: 0.77rem;
+        font-weight: 750;
+      }
+
+      .page-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .home-link {
+        display: inline-flex;
+        min-height: 40px;
+        align-items: center;
+        padding: 8px 12px;
+        border: 1px solid #d5e2e9;
+        border-radius: 11px;
+        color: #315267;
+        background: #f3f8fa;
+        font-size: 0.77rem;
+        font-weight: 750;
+      }
+
+      .hero {
+        padding: clamp(24px, 5vw, 46px);
+        border: 1px solid #e0e9ef;
+        border-radius: 24px;
+        background:
+          radial-gradient(circle at 90% 10%, rgb(91 183 199 / 15%), transparent 32%),
+          linear-gradient(135deg, #fff, #f7fbfd);
+        box-shadow: 0 15px 40px rgb(25 57 77 / 6%);
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: #19809a;
+        font-size: 0.65rem;
+        font-weight: 850;
+        letter-spacing: 0.15em;
+      }
+
+      .hero h1 {
+        margin: 0;
+        color: #17364b;
+        font-size: clamp(1.7rem, 5vw, 3rem);
+        letter-spacing: -0.04em;
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+      }
+
+      .hero-copy {
+        max-width: 720px;
+        margin: 14px 0 0;
+        color: #5e7486;
+        font-size: 0.9rem;
+        line-height: 1.85;
+      }
+
+      .hero-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 20px;
+      }
+
+      .chip {
+        padding: 7px 11px;
+        border: 1px solid #d5e6ec;
+        border-radius: 999px;
+        color: #24697b;
+        background: #f2f9fb;
+        font-size: 0.68rem;
+        font-weight: 750;
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(270px, 0.75fr);
+        gap: 16px;
+        align-items: start;
+        margin-top: 17px;
+      }
+
+      .column {
+        display: grid;
+        gap: 16px;
+        min-width: 0;
+      }
+
+      .panel {
+        padding: 22px;
+        border: 1px solid #e0e8ef;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 10px 28px rgb(25 57 77 / 5%);
+      }
+
+      .panel-kicker {
+        margin: 0 0 6px;
+        color: #19809a;
+        font-size: 0.62rem;
+        font-weight: 850;
+        letter-spacing: 0.13em;
+      }
+
+      .panel h2 {
+        margin: 0 0 14px;
+        color: #1c3c51;
+        font-size: 1rem;
+      }
+
+      .panel p {
+        margin: 0;
+        color: #607789;
+        font-size: 0.75rem;
+        line-height: 1.8;
+      }
+
+      .access-route {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 10px;
+        align-items: center;
+        padding: 14px;
+        border-radius: 12px;
+        background: #f5f9fb;
+      }
+
+      .route-label {
+        display: block;
+        margin-bottom: 5px;
+        color: #788b9a;
+        font-size: 0.62rem;
+      }
+
+      .route-name {
+        display: block;
+        color: #25465b;
+        font-size: 0.76rem;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+      }
+
+      .route-arrow {
+        color: #21819a;
+      }
+
+      .access-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 11px;
+      }
+
+      .stat {
+        padding: 12px;
+        border: 1px solid #e5edf2;
+        border-radius: 12px;
+      }
+
+      .stat span,
+      .stat strong {
+        display: block;
+      }
+
+      .stat span {
+        color: #718494;
+        font-size: 0.63rem;
+      }
+
+      .stat strong {
+        margin-top: 5px;
+        color: #23536a;
+        font-size: 0.9rem;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 41px;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 13px;
+        border: 1px solid #d5e2e9;
+        border-radius: 11px;
+        color: #315267;
+        background: #fff;
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .button-primary {
+        border-color: #176b84;
+        color: #fff;
+        background: linear-gradient(135deg, #2486a0, #17627c);
+      }
+
+      .notice {
+        margin-top: 13px !important;
+        padding: 12px 13px;
+        border-left: 3px solid #e4a84e;
+        border-radius: 4px;
+        color: #6b5b3e !important;
+        background: #fff9ec;
+        font-size: 0.68rem !important;
+      }
+
+      .info-list {
+        display: grid;
+        gap: 0;
+        margin: 0;
+      }
+
+      .info-row {
+        display: grid;
+        grid-template-columns: 90px minmax(0, 1fr);
+        gap: 10px;
+        padding: 11px 0;
+        border-bottom: 1px solid #edf1f4;
+        font-size: 0.71rem;
+        line-height: 1.6;
+      }
+
+      .info-row:last-child {
+        border-bottom: 0;
+      }
+
+      .info-row dt {
+        color: #738697;
+      }
+
+      .info-row dd {
+        margin: 0;
+        color: #2f4d61;
+        font-weight: 750;
+      }
+
+      .loading,
+      .error-state {
+        padding: 28px;
+        border: 1px solid #e0e8ef;
+        border-radius: 16px;
+        color: #607789;
+        background: #fff;
+        line-height: 1.8;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        padding-block: 20px;
+        border-top: 1px solid var(--line);
+        color: #6b7f90;
+        font-size: 0.65rem;
+      }
+
+      @media (max-width: 700px) {
+        .content-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .topbar,
+        main,
+        footer {
+          width: min(100% - 28px, 1040px);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .hero,
+        .panel {
+          padding: 17px;
+          border-radius: 15px;
+        }
+
+        .access-route {
+          gap: 7px;
+          padding: 11px;
+        }
+
+        .info-row {
+          grid-template-columns: 75px minmax(0, 1fr);
+        }
+
+        footer {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="index.html#top">
+        <span class="brand-mark" aria-hidden="true">Y</span>
+        <span>YORIMICHI BIYORI</span>
+      </a>
+      <span class="eyebrow">EVENT GUIDE · JAPAN</span>
+    </header>
+
+    <main>
+      <nav class="page-navigation" aria-label="ページ移動">
+        <a class="back-link" id="back-link" href="index.html#planner">← ひとつ戻る</a>
+        <a class="home-link" href="index.html#top">⌂ 最初の画面へ</a>
+        <a class="home-link" href="route.html">経路を調べる</a>
+        <a class="home-link" href="places.html">近くのお店・施設</a>
+        <a class="home-link" href="events.html">イベント一覧</a>
+      </nav>
+      <div class="loading" id="loading-state" role="status">イベント情報を準備しています…</div>
+      <section id="event-content" hidden>
+        <header class="hero">
+          <p class="eyebrow">SEASONAL EVENT · REFERENCE GUIDE</p>
+          <h1 id="event-name"></h1>
+          <p class="hero-copy" id="event-description"></p>
+          <div class="hero-chips">
+            <span class="chip" id="event-region"></span>
+            <span class="chip" id="event-period"></span>
+            <span class="chip">開催日・開催有無は公式発表を確認</span>
+          </div>
+        </header>
+
+        <div class="content-grid">
+          <div class="column">
+            <section class="panel" aria-labelledby="event-overview-title">
+              <p class="panel-kicker">ABOUT THIS EVENT</p>
+              <h2 id="event-overview-title">イベント概要</h2>
+              <p id="event-summary"></p>
+              <p class="notice">このページは例年の季節・地域をもとにした案内です。開催年によって日程、内容、会場、開催有無が変わる場合があります。参加前に主催者の最新情報を確認してください。</p>
+            </section>
+            <section class="panel" aria-labelledby="event-access-title">
+              <p class="panel-kicker">ACCESS</p>
+              <h2 id="event-access-title">会場周辺へのアクセス</h2>
+              <div class="access-route">
+                <div>
+                  <span class="route-label">出発地</span>
+                  <strong class="route-name" id="origin-name">出発地未設定</strong>
+                </div>
+                <span class="route-arrow" aria-hidden="true">→</span>
+                <div>
+                  <span class="route-label">イベント会場周辺</span>
+                  <strong class="route-name" id="event-destination"></strong>
+                </div>
+              </div>
+              <div class="access-stats">
+                <div class="stat"><span>直線距離の目安</span><strong id="event-distance">—</strong></div>
+                <div class="stat"><span>所要時間の目安</span><strong id="event-duration">—</strong></div>
+              </div>
+              <p class="notice">所要時間は直線距離と移動手段から計算した概算です。実際の経路・公共交通の時刻・イベント当日の交通規制は反映していません。</p>
+              <div class="actions">
+                <a class="button button-primary" id="directions-link">Google マップで経路を確認 ↗</a>
+                <a class="button" id="event-route-link">経路条件を別ページで調整 ↗</a>
+                <a class="button" id="venue-link">会場周辺の地図を見る ↗</a>
+              </div>
+            </section>
+          </div>
+
+          <aside class="column">
+            <section class="panel" aria-labelledby="event-info-title">
+              <p class="panel-kicker">EVENT INFO</p>
+              <h2 id="event-info-title">確認できる情報</h2>
+              <dl class="info-list">
+                <div class="info-row"><dt>開催時期</dt><dd id="info-period"></dd></div>
+                <div class="info-row"><dt>エリア</dt><dd id="info-region"></dd></div>
+                <div class="info-row"><dt>開催日</dt><dd>年度ごとの公式発表を確認</dd></div>
+                <div class="info-row"><dt>会場</dt><dd>会場・観覧場所を公式情報で確認</dd></div>
+              </dl>
+              <div class="actions">
+                <a class="button button-primary" id="official-link" target="_blank" rel="noopener noreferrer">最新の公式情報を検索 ↗</a>
+              </div>
+            </section>
+            <section class="panel">
+              <p class="panel-kicker">KEEP EXPLORING</p>
+              <h2>周辺のスポットも見る</h2>
+              <p>イベントの前後に立ち寄れる場所や、周辺のおすすめを確認できます。</p>
+              <div class="actions">
+                <a class="button" id="spot-back-link" href="index.html#planner">スポット詳細に戻る ↗</a>
+                <a class="button" href="index.html#planner">地図で探す ↗</a>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+      <section class="error-state" id="error-state" role="alert" hidden>
+        イベント情報を表示できませんでした。イベント一覧に戻り、もう一度選択してください。
+      </section>
+    </main>
+
+    <footer>
+      <span>© YORIMICHI BIYORI</span>
+      <span>イベント時期は参考情報です。開催内容は主催者の発表をご確認ください。</span>
+    </footer>
+
+    <script src="events.js"></script>
+    <script>
+      (() => {
+        const pageParams = new URLSearchParams(window.location.search);
+        const eventId = pageParams.get("event");
+        const spotId = pageParams.get("spot");
+        const fromEvents = pageParams.get("from") === "events";
+        const spotHref = spotId ? `spot.html?spot=${encodeURIComponent(spotId)}` : "index.html#planner";
+        const backHref = spotId ? spotHref : fromEvents ? "events.html" : "index.html#planner";
+        const backLink = document.getElementById("back-link");
+        backLink.href = backHref;
+        if (fromEvents && !spotId) backLink.textContent = "← イベント一覧へ戻る";
+        const event = Array.isArray(window.YorimichiEvents)
+          ? window.YorimichiEvents.find((item) => item.id === eventId)
+          : null;
+        const loading = document.getElementById("loading-state");
+        const content = document.getElementById("event-content");
+        const errorState = document.getElementById("error-state");
+        const modeSpeeds = { transit: 30, driving: 35, walking: 4.5, bicycling: 15 };
+        const routeFactors = { transit: 1.45, driving: 1.35, walking: 1.2, bicycling: 1.2 };
+        const setText = (id, value) => {
+          document.getElementById(id).textContent = value;
+        };
+        const googleSearch = (query) => `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        const directionsUrl = (origin, destination, mode) => {
+          const params = new URLSearchParams({ api: "1", destination, travelmode: mode });
+          if (origin) params.set("origin", origin);
+          return `https://www.google.com/maps/dir/?${params.toString()}`;
+        };
+        const monthsLabel = (months) => {
+          if (months.length === 4 && months[0] === 11 && months[3] === 2) return "例年11月〜翌2月ごろ";
+          const contiguous = months.every((month, index) => index === 0 || month === months[index - 1] + 1);
+          if (contiguous && months.length > 1) return `例年${months[0]}〜${months[months.length - 1]}月ごろ`;
+          return `例年${months.map((month) => `${month}月`).join("・")}ごろ`;
+        };
+        const haversineKm = (a, b) => {
+          const radians = (degrees) => degrees * Math.PI / 180;
+          const dLat = radians(b.lat - a.lat);
+          const dLng = radians(b.lng - a.lng);
+          const value = Math.sin(dLat / 2) ** 2 + Math.cos(radians(a.lat)) * Math.cos(radians(b.lat)) * Math.sin(dLng / 2) ** 2;
+          return 6371 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+        };
+        if (!event) {
+          loading.hidden = true;
+          errorState.hidden = false;
+          return;
+        }
+
+        const originContext = (() => {
+          try {
+            const raw = sessionStorage.getItem("yorimichi-spot-detail-context");
+            const context = raw ? JSON.parse(raw) : null;
+            return spotId && context && context.spot && context.spot.id === spotId && context.origin &&
+              Number.isFinite(context.origin.lat) && Number.isFinite(context.origin.lng)
+              ? { ...context.origin, travelMode: context.travelMode }
+              : null;
+          } catch (error) {
+            console.error("Could not read event access context", error);
+            return null;
+          }
+        })();
+        const period = monthsLabel(event.months);
+        const currentYear = new Date().getFullYear();
+        document.title = `${event.name} | イベント詳細 | よりみち日和`;
+        setText("event-name", event.name);
+        setText("event-description", `${event.region}周辺で${period.replace("例年", "").replace("ごろ", "")}に行われることのあるイベントです。`);
+        setText("event-region", `${event.region}エリア`);
+        setText("event-period", period);
+        setText("event-summary", event.detail);
+        setText("info-period", period);
+        setText("info-region", `${event.region}周辺`);
+        setText("event-destination", `${event.name} 会場周辺`);
+        const relatedLink = document.getElementById("spot-back-link");
+        relatedLink.href = spotId ? spotHref : fromEvents ? "events.html" : "index.html#planner";
+        if (!spotId) relatedLink.textContent = fromEvents ? "イベント一覧に戻る ↗" : "地図でスポットを探す ↗";
+        document.getElementById("official-link").href = googleSearch(`${event.name} ${currentYear} 開催日 公式`);
+        document.getElementById("venue-link").href =
+          `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.lat},${event.lng}`)}`;
+        const routeParams = new URLSearchParams({
+          to: `${event.lat},${event.lng}`,
+          toLabel: `${event.name} 会場周辺`,
+          mode: "transit"
+        });
+        if (originContext) {
+          const mode = modeSpeeds[originContext.travelMode] ? originContext.travelMode : "transit";
+          const distance = haversineKm(originContext, event);
+          const allowance = mode === "transit" ? 20 : mode === "driving" ? 8 : 0;
+          const duration = Math.max(1, Math.round(distance / modeSpeeds[mode] * 60 * routeFactors[mode] + allowance));
+          setText("origin-name", originContext.label || "設定した出発地");
+          setText("event-distance", `約${distance.toFixed(1)} km`);
+          setText("event-duration", `約${duration}分`);
+          document.getElementById("directions-link").href =
+            directionsUrl(`${originContext.lat},${originContext.lng}`, `${event.lat},${event.lng}`, mode);
+          routeParams.set("from", `${originContext.lat},${originContext.lng}`);
+          routeParams.set("fromLabel", originContext.label || "設定した出発地");
+          routeParams.set("mode", mode);
+        } else {
+          setText("origin-name", "出発地未設定");
+          setText("event-distance", "出発地を設定してください");
+          setText("event-duration", "目安を計算できません");
+          document.getElementById("directions-link").href =
+            directionsUrl("", `${event.lat},${event.lng}`, "transit");
+        }
+        document.getElementById("event-route-link").href = `route.html?${routeParams.toString()}`;
+        loading.hidden = true;
+        content.hidden = false;
+      })();
+    </script>
+  </body>
+</html>

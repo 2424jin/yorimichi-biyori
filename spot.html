@@ -1,0 +1,1202 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3f7fb">
+    <meta name="description" content="お出かけスポットの紹介、アクセス、天気、季節イベントを確認できます。">
+    <title>スポット詳細 | よりみち日和</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+        color: #1c3446;
+        background: #f3f7fb;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        --ink: #1c3446;
+        --muted: #6b7f90;
+        --line: #dce6ed;
+        --blue: #176f89;
+        --pale: #eff8fa;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      @view-transition {
+        navigation: auto;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        background:
+          radial-gradient(ellipse at 12% 0, rgb(41 139 173 / 10%), transparent 34%),
+          linear-gradient(180deg, #f8fbfd, #eef4f8 58%, #f5f8fb);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a:focus-visible,
+      button:focus-visible {
+        outline: 3px solid #2892ad;
+        outline-offset: 3px;
+      }
+
+      .page-navigation a:hover,
+      .button-link:hover {
+        border-color: #9dc9d6;
+        color: #176f89;
+      }
+
+      .topbar,
+      main,
+      footer {
+        width: min(100% - 40px, 1180px);
+        margin-inline: auto;
+      }
+
+      .topbar {
+        display: flex;
+        min-height: 72px;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #17364b;
+        font-size: 0.78rem;
+        font-weight: 850;
+        letter-spacing: 0.12em;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 31px;
+        height: 31px;
+        place-items: center;
+        border-radius: 10px;
+        color: #fff;
+        background: linear-gradient(145deg, #2485a0, #165676);
+      }
+
+      .topbar-note {
+        color: var(--muted);
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+      }
+
+      main {
+        padding-block: 34px 64px;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 40px;
+        padding: 8px 12px;
+        border: 1px solid #d5e2e9;
+        border-radius: 11px;
+        color: #315267;
+        background: #fff;
+        font-size: 0.77rem;
+        font-weight: 750;
+      }
+
+      .page-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .home-link {
+        display: inline-flex;
+        min-height: 40px;
+        align-items: center;
+        padding: 8px 12px;
+        border: 1px solid #d5e2e9;
+        border-radius: 11px;
+        color: #315267;
+        background: #f3f8fa;
+        font-size: 0.77rem;
+        font-weight: 750;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(24px, 5vw, 48px);
+        border: 1px solid #e0e9ef;
+        border-radius: 25px;
+        background:
+          radial-gradient(circle at 90% 10%, rgb(91 183 199 / 15%), transparent 32%),
+          linear-gradient(135deg, #fff, #f7fbfd);
+        box-shadow: 0 15px 40px rgb(25 57 77 / 6%);
+      }
+
+      .hero::after {
+        position: absolute;
+        right: 6%;
+        bottom: -120px;
+        width: 280px;
+        height: 280px;
+        border: 1px solid rgb(45 140 161 / 13%);
+        border-radius: 50%;
+        box-shadow: 0 0 0 28px rgb(45 140 161 / 4%), 0 0 0 56px rgb(45 140 161 / 3%);
+        content: "";
+        pointer-events: none;
+      }
+
+      .hero-topline {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .kind-chip,
+      .area-chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 27px;
+        padding: 4px 10px;
+        border: 1px solid #cfe2e9;
+        border-radius: 999px;
+        color: #24697b;
+        background: #f2f9fb;
+        font-size: 0.67rem;
+        font-weight: 750;
+      }
+
+      .area-chip {
+        border-color: #e0e7ed;
+        color: #607789;
+        background: #fff;
+      }
+
+      .hero h1 {
+        position: relative;
+        z-index: 1;
+        max-width: 850px;
+        margin: 18px 0 10px;
+        color: #17364b;
+        font-size: clamp(1.75rem, 5vw, 3.2rem);
+        letter-spacing: -0.045em;
+        line-height: 1.2;
+        overflow-wrap: anywhere;
+      }
+
+      .hero-description {
+        position: relative;
+        z-index: 1;
+        max-width: 760px;
+        margin: 0;
+        color: #5e7486;
+        font-size: 0.94rem;
+        line-height: 1.9;
+      }
+
+      .quick-facts {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 21px;
+      }
+
+      .fact-chip {
+        padding: 8px 12px;
+        border: 1px solid #e0e9ef;
+        border-radius: 10px;
+        color: #496476;
+        background: rgb(255 255 255 / 84%);
+        font-size: 0.7rem;
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(270px, 0.8fr);
+        gap: 17px;
+        align-items: start;
+        margin-top: 18px;
+      }
+
+      .main-column,
+      .aside-column {
+        display: grid;
+        gap: 17px;
+        min-width: 0;
+      }
+
+      .panel {
+        min-width: 0;
+        padding: 22px;
+        border: 1px solid #e0e8ef;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 10px 28px rgb(25 57 77 / 5%);
+      }
+
+      .panel-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 15px;
+      }
+
+      .panel-kicker {
+        margin: 0 0 6px;
+        color: #19809a;
+        font-size: 0.62rem;
+        font-weight: 850;
+        letter-spacing: 0.13em;
+      }
+
+      .panel h2 {
+        margin: 0;
+        color: #1c3c51;
+        font-size: 1rem;
+      }
+
+      .panel-copy {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.75rem;
+        line-height: 1.75;
+      }
+
+      .travel-route {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+        padding: 16px;
+        border-radius: 13px;
+        background: #f5f9fb;
+      }
+
+      .route-end {
+        min-width: 0;
+      }
+
+      .route-label {
+        display: block;
+        margin-bottom: 5px;
+        color: #788b9a;
+        font-size: 0.64rem;
+      }
+
+      .route-name {
+        display: block;
+        color: #25465b;
+        font-size: 0.8rem;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+      }
+
+      .route-arrow {
+        color: #21819a;
+        font-size: 1.15rem;
+      }
+
+      .travel-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .access-origin-form {
+        display: grid;
+        gap: 8px;
+        margin-top: 12px;
+        padding: 13px;
+        border: 1px solid #e1eaf0;
+        border-radius: 13px;
+        background: #fbfdfe;
+      }
+
+      .access-origin-form label {
+        color: #415f72;
+        font-size: 0.68rem;
+        font-weight: 800;
+      }
+
+      .access-origin-controls {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+      }
+
+      .access-origin-form input,
+      .access-origin-form select {
+        min-width: 0;
+        min-height: 42px;
+        padding: 9px 11px;
+        border: 1px solid #d5e2e9;
+        border-radius: 10px;
+        color: #25465b;
+        background: #fff;
+        font: inherit;
+        font-size: 0.72rem;
+      }
+
+      .access-origin-form input:focus-visible,
+      .access-origin-form select:focus-visible {
+        outline: 3px solid rgb(40 146 173 / 28%);
+        border-color: #2892ad;
+      }
+
+      .access-origin-form button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      .access-origin-secondary {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .access-origin-status {
+        margin: 0;
+        color: #718494;
+        font-size: 0.66rem;
+        line-height: 1.6;
+      }
+
+      .access-origin-status[data-state="error"] {
+        color: #8a483b;
+      }
+
+      .access-origin-status[data-state="ok"] {
+        color: #28775f;
+      }
+
+      .travel-stat {
+        padding: 12px;
+        border: 1px solid #e5edf2;
+        border-radius: 12px;
+      }
+
+      .travel-stat span,
+      .travel-stat strong {
+        display: block;
+      }
+
+      .travel-stat span {
+        color: #718494;
+        font-size: 0.64rem;
+      }
+
+      .travel-stat strong {
+        margin-top: 5px;
+        color: #23536a;
+        font-size: 0.9rem;
+      }
+
+      .panel-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 15px;
+      }
+
+      .button-link {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 14px;
+        border: 1px solid #d5e2e9;
+        border-radius: 11px;
+        color: #315267;
+        background: #fff;
+        font-size: 0.73rem;
+        font-weight: 800;
+      }
+
+      .button-primary {
+        border-color: #176b84;
+        color: #fff;
+        background: linear-gradient(135deg, #2486a0, #17627c);
+      }
+
+      .state-message {
+        display: flex;
+        min-height: 58px;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        color: #617587;
+        background: #f5f8fa;
+        font-size: 0.74rem;
+        line-height: 1.7;
+      }
+
+      .state-message[data-state="error"] {
+        color: #8a483b;
+        background: #fff4f0;
+      }
+
+      .weather-value {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 13px;
+      }
+
+      .weather-icon {
+        display: grid;
+        width: 48px;
+        height: 48px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 15px;
+        background: #eff8fb;
+        font-size: 1.5rem;
+      }
+
+      .weather-value strong {
+        display: block;
+        color: #1b4e67;
+        font-size: 1.4rem;
+      }
+
+      .weather-value span {
+        color: var(--muted);
+        font-size: 0.72rem;
+      }
+
+      .event-list {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .event-item {
+        display: grid;
+        grid-template-columns: 58px minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: center;
+        padding: 12px;
+        border: 1px solid #e6edf2;
+        border-radius: 12px;
+        background: #fbfcfd;
+      }
+
+      .event-season {
+        display: grid;
+        min-height: 42px;
+        place-items: center;
+        border-radius: 10px;
+        color: #18758b;
+        background: #eef8fa;
+        font-size: 0.68rem;
+        font-weight: 850;
+      }
+
+      .event-name {
+        display: block;
+        color: #25465b;
+        font-size: 0.78rem;
+        font-weight: 850;
+      }
+
+      .event-meta {
+        display: block;
+        margin-top: 3px;
+        color: #738697;
+        font-size: 0.64rem;
+        line-height: 1.55;
+      }
+
+      .event-link {
+        color: #16738a;
+        font-size: 0.68rem;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .sport-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 13px;
+      }
+
+      .info-list {
+        display: grid;
+        gap: 0;
+        margin: 0;
+      }
+
+      .info-row {
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr);
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #edf1f4;
+        font-size: 0.72rem;
+        line-height: 1.6;
+      }
+
+      .info-row:last-child {
+        border-bottom: 0;
+      }
+
+      .info-row dt {
+        color: #738697;
+      }
+
+      .info-row dd {
+        margin: 0;
+        color: #2f4d61;
+        font-weight: 750;
+        overflow-wrap: anywhere;
+      }
+
+      .fine-print {
+        margin: 12px 0 0;
+        color: #75899a;
+        font-size: 0.64rem;
+        line-height: 1.75;
+      }
+
+      .loading {
+        display: grid;
+        min-height: 48vh;
+        place-items: center;
+        color: #607688;
+        text-align: center;
+        line-height: 1.8;
+      }
+
+      .loading[hidden],
+      .page-content[hidden] {
+        display: none;
+      }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        padding-block: 20px;
+        border-top: 1px solid var(--line);
+        color: #6b7f90;
+        font-size: 0.65rem;
+      }
+
+      @media (max-width: 780px) {
+        .content-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .aside-column {
+          grid-row: 1;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .topbar,
+        main,
+        footer {
+          width: min(100% - 28px, 1180px);
+        }
+
+        .topbar {
+          min-height: 62px;
+        }
+
+        .topbar-note {
+          font-size: 0.55rem;
+        }
+
+        main {
+          padding-top: 23px;
+        }
+
+        .hero,
+        .panel {
+          padding: 18px;
+          border-radius: 16px;
+        }
+
+        .travel-route {
+          grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+          gap: 7px;
+          padding: 12px;
+        }
+
+        .travel-stats {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .access-origin-controls {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .event-item {
+          grid-template-columns: 48px minmax(0, 1fr);
+        }
+
+        .event-link {
+          grid-column: 2;
+        }
+
+        .info-row {
+          grid-template-columns: 76px minmax(0, 1fr);
+        }
+
+        footer {
+          flex-direction: column;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="index.html#top">
+        <span class="brand-mark" aria-hidden="true">Y</span>
+        <span>YORIMICHI BIYORI</span>
+      </a>
+      <span class="topbar-note">SPOT GUIDE · JAPAN</span>
+    </header>
+
+    <main>
+      <nav class="page-navigation" aria-label="ページ移動">
+        <a class="back-link" id="back-link" href="index.html#planner">← ひとつ戻る</a>
+        <a class="home-link" href="index.html#top">⌂ 最初の画面へ</a>
+        <a class="home-link" href="route.html">経路を調べる</a>
+        <a class="home-link" href="places.html">近くのお店・施設</a>
+        <a class="home-link" href="events.html">イベント一覧</a>
+      </nav>
+      <div class="loading" id="loading-state" role="status">スポット情報を準備しています…</div>
+      <div class="page-content" id="page-content" hidden>
+        <section class="hero" aria-labelledby="spot-name">
+          <div class="hero-topline">
+            <span class="kind-chip" id="spot-kind"></span>
+            <span class="area-chip" id="spot-area"></span>
+          </div>
+          <h1 id="spot-name"></h1>
+          <p class="hero-description" id="spot-description"></p>
+          <div class="quick-facts" id="quick-facts"></div>
+        </section>
+
+        <div class="content-grid">
+          <div class="main-column">
+            <section class="panel" aria-labelledby="access-title">
+              <div class="panel-heading">
+                <div>
+                  <p class="panel-kicker">ACCESS</p>
+                  <h2 id="access-title">出発地からのアクセス</h2>
+                </div>
+              </div>
+              <div class="travel-route">
+                <div class="route-end">
+                  <span class="route-label">出発地</span>
+                  <strong class="route-name" id="origin-name"></strong>
+                </div>
+                <span class="route-arrow" aria-hidden="true">→</span>
+                <div class="route-end">
+                  <span class="route-label">目的地</span>
+                  <strong class="route-name" id="destination-name"></strong>
+                </div>
+              </div>
+              <form class="access-origin-form" id="access-origin-form">
+                <label for="access-origin-input">出発地を入力してアクセスを更新</label>
+                <div class="access-origin-controls">
+                  <input id="access-origin-input" name="origin" type="search" autocomplete="off" aria-describedby="access-origin-status" placeholder="駅名・住所・地名">
+                  <button class="button-link button-primary" id="access-origin-submit" type="submit">出発地を設定</button>
+                </div>
+                <div class="access-origin-secondary">
+                  <button class="button-link" id="access-origin-current" type="button">現在地から検索</button>
+                  <label for="access-mode">移動手段</label>
+                  <select id="access-mode" aria-label="アクセスの移動手段">
+                    <option value="transit">電車・公共交通</option>
+                    <option value="driving">車</option>
+                    <option value="walking">徒歩</option>
+                    <option value="bicycling">自転車</option>
+                  </select>
+                </div>
+                <p class="access-origin-status" id="access-origin-status" role="status" aria-live="polite">出発地を変更すると距離・所要時間とGoogle マップの経路も更新されます。</p>
+              </form>
+              <div class="travel-stats">
+                <div class="travel-stat"><span>直線距離の目安</span><strong id="travel-distance">—</strong></div>
+                <div class="travel-stat"><span>所要時間の目安</span><strong id="travel-duration">—</strong></div>
+              </div>
+              <p class="fine-print" id="travel-note">所要時間は距離から算出した概算です。実際の乗換・運行状況は経路検索でご確認ください。</p>
+              <div class="panel-actions">
+                <a class="button-link button-primary" id="route-link">Google マップで経路を確認 ↗</a>
+                <a class="button-link" id="route-page-link">経路条件を別ページで調整 ↗</a>
+                <a class="button-link" id="spot-map-link">地図で場所を見る ↗</a>
+              </div>
+            </section>
+
+            <section class="panel" aria-labelledby="weather-title">
+              <div class="panel-heading">
+                <div>
+                  <p class="panel-kicker">WEATHER</p>
+                  <h2 id="weather-title">スポット周辺の天気</h2>
+                </div>
+              </div>
+              <p class="panel-copy" id="weather-location"></p>
+              <div id="weather-state" class="state-message" role="status" aria-live="polite">天気情報を取得しています…</div>
+              <div class="weather-value" id="weather-value" hidden>
+                <span class="weather-icon" id="weather-icon" aria-hidden="true">🌤️</span>
+                <div><strong id="weather-temperature"></strong><span id="weather-description"></span></div>
+              </div>
+              <p class="fine-print">天気はOpen-Meteoの現在値です。予報の更新・取得状況により、実際の天候と異なる場合があります。</p>
+            </section>
+
+            <section class="panel" aria-labelledby="events-title">
+              <div class="panel-heading">
+                <div>
+                  <p class="panel-kicker">SEASONAL EVENTS</p>
+                  <h2 id="events-title">近隣の季節イベント</h2>
+                </div>
+              </div>
+              <p class="panel-copy" id="events-note"></p>
+              <ul class="event-list" id="event-list"></ul>
+              <div class="panel-actions">
+                <a class="button-link" id="event-search-link" target="_blank" rel="noopener noreferrer">この周辺の開催情報を検索 ↗</a>
+                <a class="button-link" href="events.html">イベント一覧を見る ↗</a>
+              </div>
+            </section>
+
+            <section class="panel" aria-labelledby="football-title">
+              <div class="panel-heading">
+                <div>
+                  <p class="panel-kicker">TODAY · FOOTBALL</p>
+                  <h2 id="football-title">今日のサッカー・試合情報</h2>
+                </div>
+              </div>
+              <p class="panel-copy" id="football-note"></p>
+              <div class="sport-actions">
+                <a class="button-link button-primary" id="football-search-link" target="_blank" rel="noopener noreferrer">地域の今日の試合を検索 ↗</a>
+                <a class="button-link" href="https://www.jleague.jp/match/" target="_blank" rel="noopener noreferrer">Jリーグ公式日程 ↗</a>
+              </div>
+            </section>
+          </div>
+
+          <aside class="aside-column">
+            <section class="panel" aria-labelledby="info-title">
+              <div class="panel-heading">
+                <div>
+                  <p class="panel-kicker">SPOT INFO</p>
+                  <h2 id="info-title">スポット情報</h2>
+                </div>
+              </div>
+              <dl class="info-list" id="spot-info"></dl>
+              <p class="fine-print">営業時間・料金・休業日・予約方法は変更されることがあります。お出かけ前に施設の公式情報をご確認ください。</p>
+              <div class="panel-actions">
+                <a class="button-link button-primary" id="official-search-link" target="_blank" rel="noopener noreferrer">施設の公式情報を検索 ↗</a>
+              </div>
+            </section>
+            <section class="panel">
+              <p class="panel-kicker">PLAN YOUR VISIT</p>
+              <h2>この場所からプランを作る</h2>
+              <p class="panel-copy">メイン画面に戻り、このスポットを出発地または目的地に設定できます。</p>
+              <div class="panel-actions">
+                <a class="button-link" href="index.html#planner">プラン作成画面へ ↗</a>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </div>
+      <section class="panel" id="error-state" role="alert" hidden>
+        <p class="panel-kicker">SPOT NOT FOUND</p>
+        <h2>スポットを表示できませんでした</h2>
+        <p class="panel-copy">スポット一覧に戻り、地図または一覧から別の場所を選択してください。</p>
+        <div class="panel-actions"><a class="button-link button-primary" href="index.html#planner">スポット一覧に戻る</a></div>
+      </section>
+    </main>
+
+    <footer>
+      <span>© YORIMICHI BIYORI</span>
+      <span>天気・アクセス時間・イベント開催時期は参考情報です</span>
+    </footer>
+
+    <script src="events.js"></script>
+    <script>
+      (() => {
+        const storageKey = "yorimichi-spot-detail-context";
+        const spotId = new URLSearchParams(window.location.search).get("spot");
+        const loading = document.getElementById("loading-state");
+        const content = document.getElementById("page-content");
+        const errorState = document.getElementById("error-state");
+        const categoryLabels = {
+          shrine: "神社・寺院",
+          culture: "文化・街",
+          nature: "自然・公園",
+          station: "駅",
+          airport: "空港",
+          facility: "大型施設"
+        };
+        const modeLabels = {
+          transit: "電車・公共交通",
+          driving: "車",
+          walking: "徒歩",
+          bicycling: "自転車"
+        };
+        const speeds = { transit: 30, driving: 35, walking: 4.5, bicycling: 15 };
+        const eventCatalog = window.YorimichiEvents;
+
+        const setText = (id, value) => {
+          document.getElementById(id).textContent = value;
+        };
+        const setLink = (id, url) => {
+          document.getElementById(id).href = url;
+        };
+        const googleSearch = (query) => `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        const mapsSearch = (query) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        const mapDirections = (origin, destination, mode) => {
+          const params = new URLSearchParams({ api: "1", destination, travelmode: mode });
+          if (origin) params.set("origin", origin);
+          return `https://www.google.com/maps/dir/?${params.toString()}`;
+        };
+        const haversineKm = (a, b) => {
+          const radians = (degrees) => degrees * Math.PI / 180;
+          const dLat = radians(b.lat - a.lat);
+          const dLng = radians(b.lng - a.lng);
+          const startLat = radians(a.lat);
+          const endLat = radians(b.lat);
+          const value = Math.sin(dLat / 2) ** 2 + Math.cos(startLat) * Math.cos(endLat) * Math.sin(dLng / 2) ** 2;
+          return 6371 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+        };
+        const weatherText = (code) => {
+          if (code === 0) return ["快晴", "☀️"];
+          if ([1, 2].includes(code)) return ["晴れ時々くもり", "🌤️"];
+          if (code === 3) return ["くもり", "☁️"];
+          if ([45, 48].includes(code)) return ["霧", "🌫️"];
+          if ([51, 53, 55, 56, 57].includes(code)) return ["霧雨", "🌦️"];
+          if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return ["雨", "🌧️"];
+          if ([71, 73, 75, 77, 85, 86].includes(code)) return ["雪", "❄️"];
+          if ([95, 96, 99].includes(code)) return ["雷雨", "⛈️"];
+          return ["天気情報", "🌤️"];
+        };
+        const showError = () => {
+          loading.hidden = true;
+          errorState.hidden = false;
+        };
+        const loadContext = () => {
+          try {
+            const raw = sessionStorage.getItem(storageKey);
+            return raw ? JSON.parse(raw) : null;
+          } catch (error) {
+            console.error("Could not read spot detail context", error);
+            return null;
+          }
+        };
+        const renderEvents = (spot) => {
+          const now = new Date();
+          const month = now.getMonth() + 1;
+          const spotRegion = `${spot.area || ""} ${spot.name || ""}`;
+          const candidates = (Array.isArray(eventCatalog) ? eventCatalog : []).map((event) => {
+            const regionMatches = spotRegion.includes(event.region);
+            const distanceKm = haversineKm(spot, event);
+            return { ...event, regionMatches, distanceKm };
+          }).filter((event) =>
+            event.months.includes(month) || event.months.includes(month % 12 + 1)
+          ).filter((event) =>
+            event.regionMatches || (event.distanceKm !== null && event.distanceKm <= 150)
+          ).sort((a, b) => {
+            if (a.regionMatches !== b.regionMatches) return a.regionMatches ? -1 : 1;
+            return a.distanceKm - b.distanceKm;
+          }).slice(0, 4);
+
+          setText("events-note", `${spot.area || spot.name}付近で${month}〜${month % 12 + 1}月ごろに例年開催される候補です。開催年の日程は確定情報ではありません。`);
+          const list = document.getElementById("event-list");
+          if (!candidates.length) {
+            const item = document.createElement("li");
+            item.className = "state-message";
+            item.textContent = "この時期の近隣イベント候補は登録されていません。下の検索から最新の開催情報をご確認ください。";
+            list.append(item);
+          } else {
+            candidates.forEach((event) => {
+              const item = document.createElement("li");
+              item.className = "event-item";
+              const season = document.createElement("span");
+              season.className = "event-season";
+              season.textContent = `${event.months[0]}月${event.months.length > 1 ? "ごろ" : ""}`;
+              const copy = document.createElement("span");
+              const name = document.createElement("strong");
+              name.className = "event-name";
+              name.textContent = event.name;
+              const meta = document.createElement("span");
+              meta.className = "event-meta";
+              meta.textContent = `${event.detail}${event.distanceKm === null ? "" : ` · 約${Math.round(event.distanceKm)} km`}`;
+              copy.append(name, meta);
+              const link = document.createElement("a");
+              link.className = "event-link";
+              link.href = `event.html?event=${encodeURIComponent(event.id)}&spot=${encodeURIComponent(spot.id)}`;
+              link.textContent = "詳細を見る ↗";
+              item.append(season, copy, link);
+              list.append(item);
+            });
+          }
+          setLink("event-search-link", googleSearch(`${spot.area || spot.name} ${now.getFullYear()}年 ${month}月 ${month % 12 + 1}月 イベント 祭り 花火 公式`));
+        };
+        let activeContext = null;
+        const setAccessStatus = (message, state) => {
+          const status = document.getElementById("access-origin-status");
+          status.textContent = message;
+          status.dataset.state = state || "";
+        };
+        const saveActiveContext = () => {
+          try {
+            sessionStorage.setItem(storageKey, JSON.stringify(activeContext));
+            return true;
+          } catch (error) {
+            console.error("Could not save spot access context", error);
+            setAccessStatus("出発地を保存できませんでした。ブラウザーのタブ保存領域を確認してください。", "error");
+            return false;
+          }
+        };
+        const renderAccess = (spot, context) => {
+          const origin = context.origin && Number.isFinite(context.origin.lat) && Number.isFinite(context.origin.lng)
+            ? context.origin
+            : null;
+          const mode = speeds[context.travelMode] ? context.travelMode : "transit";
+          document.getElementById("access-mode").value = mode;
+          setText("origin-name", origin ? origin.label || origin.name || "設定した出発地" : "出発地未設定");
+          setText("destination-name", spot.name);
+          if (origin) {
+            const distanceKm = haversineKm(origin, spot);
+            const routeFactors = { transit: 1.45, driving: 1.35, walking: 1.2, bicycling: 1.2 };
+            const transferAllowance = mode === "transit" ? 20 : mode === "driving" ? 8 : 0;
+            const estimatedMinutes = Math.max(1, Math.round(distanceKm / speeds[mode] * 60 * routeFactors[mode] + transferAllowance));
+            setText("travel-distance", `約${distanceKm.toFixed(1)} km`);
+            setText("travel-duration", `約${estimatedMinutes}分`);
+            setText("travel-note", `${modeLabels[mode]}での距離ベースの概算です。実際の道路・公共交通の発車時刻・乗換・運行状況はGoogle マップで確認してください。`);
+            setLink("route-link", mapDirections(`${origin.lat},${origin.lng}`, `${spot.lat},${spot.lng}`, mode));
+            document.getElementById("route-link").textContent = "Google マップで経路を確認 ↗";
+          } else {
+            setText("travel-distance", "出発地を設定してください");
+            setText("travel-duration", "目安を計算できません");
+            setText("travel-note", "出発地を入力するか現在地を使うと、アクセス目安とGoogle マップの経路を更新できます。");
+            setLink("route-link", mapDirections("", `${spot.lat},${spot.lng}`, mode));
+            document.getElementById("route-link").textContent = "Google マップで出発地を選んで経路を見る ↗";
+          }
+          const routeParams = new URLSearchParams({
+            to: `${spot.lat},${spot.lng}`,
+            toLabel: spot.name,
+            mode
+          });
+          if (origin) {
+            routeParams.set("from", `${origin.lat},${origin.lng}`);
+            routeParams.set("fromLabel", origin.label || origin.name || "設定した出発地");
+          }
+          setLink("route-page-link", `route.html?${routeParams.toString()}`);
+          setLink("spot-map-link", mapsSearch(`${spot.lat},${spot.lng}`));
+        };
+        const updateAccessOrigin = (origin, mode) => {
+          activeContext = {
+            ...activeContext,
+            origin,
+            travelMode: mode || document.getElementById("access-mode").value
+          };
+          if (!saveActiveContext()) return false;
+          renderAccess(spot, activeContext);
+          return true;
+        };
+        const accessOriginForm = document.getElementById("access-origin-form");
+        const accessOriginInput = document.getElementById("access-origin-input");
+        const accessOriginSubmit = document.getElementById("access-origin-submit");
+        accessOriginForm.addEventListener("submit", async (submitEvent) => {
+          submitEvent.preventDefault();
+          const query = accessOriginInput.value.trim();
+          if (!query) {
+            setAccessStatus("駅名・住所・地名を入力してください。", "error");
+            accessOriginInput.focus();
+            return;
+          }
+          accessOriginSubmit.disabled = true;
+          setAccessStatus("出発地を検索しています…");
+          const controller = new AbortController();
+          const timeout = window.setTimeout(() => controller.abort(), 9000);
+          try {
+            const params = new URLSearchParams({
+              q: query,
+              limit: "1",
+              countrycode: "JP",
+              bbox: "122,24,147,46"
+            });
+            const response = await fetch(`https://photon.komoot.io/api/?${params}`, { signal: controller.signal });
+            if (!response.ok) throw new Error(`Place search failed: ${response.status}`);
+            const data = await response.json();
+            const feature = Array.isArray(data.features) ? data.features[0] : null;
+            const coordinates = feature && feature.geometry && feature.geometry.coordinates;
+            const longitude = Number(coordinates && coordinates[0]);
+            const latitude = Number(coordinates && coordinates[1]);
+            if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || latitude < 24 || latitude > 46 || longitude < 122 || longitude > 147) {
+              setAccessStatus("出発地が見つかりませんでした。駅名や地名を変えてお試しください。", "error");
+              return;
+            }
+            const label = query;
+            if (!updateAccessOrigin({ lat: latitude, lng: longitude, label })) return;
+            accessOriginInput.value = "";
+            setAccessStatus(`出発地を「${label}」に更新しました。経路ボタンからGoogle マップを開けます。`, "ok");
+          } catch (error) {
+            console.error("Could not search for an access origin", error);
+            setAccessStatus(error.name === "AbortError"
+              ? "場所の検索がタイムアウトしました。通信状況を確認してもう一度お試しください。"
+              : "場所を検索できませんでした。インターネット接続と入力内容を確認してください。", "error");
+          } finally {
+            window.clearTimeout(timeout);
+            accessOriginSubmit.disabled = false;
+          }
+        });
+        document.getElementById("access-mode").addEventListener("change", (changeEvent) => {
+          if (updateAccessOrigin(activeContext.origin || null, changeEvent.target.value)) {
+            setAccessStatus(`${modeLabels[changeEvent.target.value]}でアクセス目安を更新しました。`, "ok");
+          }
+        });
+        document.getElementById("access-origin-current").addEventListener("click", () => {
+          if (!navigator.geolocation) {
+            setAccessStatus("このブラウザーでは現在地を取得できません。出発地を入力してください。", "error");
+            return;
+          }
+          setAccessStatus("現在地を確認しています…");
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              if (!updateAccessOrigin({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                label: "現在地"
+              })) return;
+              setAccessStatus("現在地を出発地に設定しました。経路ボタンからGoogle マップを開けます。", "ok");
+            },
+            (error) => {
+              const messages = {
+                1: "位置情報の許可がありません。ブラウザー設定を確認するか、出発地を入力してください。",
+                2: "現在地を取得できませんでした。出発地を入力してください。",
+                3: "現在地の確認がタイムアウトしました。もう一度お試しください。"
+              };
+              setAccessStatus(messages[error.code] || "現在地を取得できませんでした。出発地を入力してください。", "error");
+            },
+            { enableHighAccuracy: false, maximumAge: 300000, timeout: 10000 }
+          );
+        });
+        const loadWeather = async (spot) => {
+          const state = document.getElementById("weather-state");
+          const controller = new AbortController();
+          const timeout = window.setTimeout(() => controller.abort(), 9000);
+          try {
+            const url = new URL("https://api.open-meteo.com/v1/forecast");
+            url.search = new URLSearchParams({
+              latitude: String(spot.lat),
+              longitude: String(spot.lng),
+              current: "temperature_2m,weather_code",
+              timezone: "Asia/Tokyo"
+            }).toString();
+            const response = await fetch(url, { signal: controller.signal });
+            if (!response.ok) throw new Error(`Weather request failed: ${response.status}`);
+            const data = await response.json();
+            if (!data.current || !Number.isFinite(data.current.temperature_2m)) throw new Error("Weather data was unavailable");
+            const [description, icon] = weatherText(data.current.weather_code);
+            document.getElementById("weather-icon").textContent = icon;
+            setText("weather-temperature", `${Math.round(data.current.temperature_2m)}°C`);
+            setText("weather-description", `${description} · ${new Date(data.current.time).toLocaleString("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })} 時点`);
+            document.getElementById("weather-value").hidden = false;
+            state.hidden = true;
+          } catch (error) {
+            state.dataset.state = "error";
+            state.textContent = "天気を取得できませんでした。通信状況を確認するか、天気予報サービスで最新情報をご確認ください。";
+            console.error("Could not load spot weather", error);
+          } finally {
+            window.clearTimeout(timeout);
+          }
+        };
+        const renderSpot = (spot, context) => {
+          setText("spot-kind", `${spot.emoji || "📍"} ${spot.spotKind ? categoryLabels[spot.spotKind] || "観光スポット" : "観光スポット"}`);
+          setText("spot-area", spot.area || "日本");
+          setText("spot-name", spot.name);
+          setText("spot-description", spot.description || "お出かけ先の候補です。営業情報やアクセスを事前にご確認ください。");
+          document.title = `${spot.name} | よりみち日和`;
+          const quickFacts = document.getElementById("quick-facts");
+          [
+            `滞在目安 約${spot.stayMinutes || 60}分`,
+            `待ち時間目安 約${spot.waitMinutes || 0}分`,
+            `費用目安 約${Number(spot.estimatedCostYen || 0).toLocaleString("ja-JP")}円`
+          ].forEach((text) => {
+            const fact = document.createElement("span");
+            fact.className = "fact-chip";
+            fact.textContent = text;
+            quickFacts.append(fact);
+          });
+          renderAccess(spot, context);
+          setText("weather-location", `${spot.area || spot.name}の座標をもとに現在の天気を取得します。`);
+          const rows = [
+            ["スポット種別", categoryLabels[spot.spotKind] || spot.categoryLabel || "観光スポット"],
+            ["エリア", spot.area || "—"],
+            ["滞在・待ち時間", `約${spot.stayMinutes || 60}分 · 待ち約${spot.waitMinutes || 0}分`],
+            ["費用目安", `約${Number(spot.estimatedCostYen || 0).toLocaleString("ja-JP")}円`]
+          ];
+          const info = document.getElementById("spot-info");
+          rows.forEach(([label, value]) => {
+            const row = document.createElement("div");
+            row.className = "info-row";
+            const term = document.createElement("dt");
+            term.textContent = label;
+            const description = document.createElement("dd");
+            description.textContent = value;
+            row.append(term, description);
+            info.append(row);
+          });
+          setLink("official-search-link", googleSearch(`${spot.name} 公式 営業時間 料金`));
+          renderEvents(spot);
+          const today = new Date();
+          const dateLabel = today.toLocaleDateString("ja-JP", { year: "numeric", month: "long", day: "numeric", weekday: "short" });
+          setText("football-note", `${dateLabel}の試合一覧を自動取得するスポーツデータAPIは接続していません。試合があると誤認させないよう、地域と日付を指定した検索・公式日程へのリンクを案内します。`);
+          setLink("football-search-link", googleSearch(`${spot.area || spot.name} ${dateLabel} サッカー 試合`));
+          loadWeather(spot);
+          loading.hidden = true;
+          content.hidden = false;
+        };
+
+        const context = loadContext();
+        const spot = context && context.spot;
+        if (!spot || !spotId || spot.id !== spotId || !Number.isFinite(spot.lat) || !Number.isFinite(spot.lng)) {
+          showError();
+          return;
+        }
+        activeContext = context;
+        renderSpot(spot, context);
+      })();
+    </script>
+  </body>
+</html>
