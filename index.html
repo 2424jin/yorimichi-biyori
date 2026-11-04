@@ -3,12 +3,15 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#07131e">
+    <meta name="theme-color" content="#13201d">
     <meta
       name="description"
       content="現在地周辺のおすすめスポットを地図で探して、日本全国のお出かけプランをつくろう。"
     >
     <title>よりみち日和 | 全国お出かけプラン</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
       :root {
         color-scheme: light;
@@ -2900,320 +2903,847 @@
           padding-inline: 5px;
         }
       }
+
+      /* ===== 案B「地図が主役」（2026-11-04） ===== */
+      body.layout-b {
+        --b-ink: #13201d;
+        --b-muted: #4a5a55;
+        --b-accent: #0f7a68;
+        --b-accent-dark: #0a5c4e;
+        --b-soft: #f1f5f3;
+        --b-line: #dbe3df;
+        --green: #0f7a68;
+        --green-dark: #0a5c4e;
+        --ink: #13201d;
+        margin: 0;
+        background: #e4ece7;
+        color: var(--b-ink);
+        font-family: "Noto Sans JP", "Yu Gothic", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      }
+
+      body.layout-b .b-visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+      }
+
+      body.layout-b .b-app {
+        position: relative;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+      }
+
+      body.layout-b .b-map-area {
+        position: absolute;
+        z-index: 0;
+        inset: 0;
+        isolation: isolate;
+      }
+
+      body.layout-b .b-map-area .map-wrap {
+        position: absolute;
+        inset: 0;
+        height: auto;
+        min-height: 0;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        overflow: hidden;
+      }
+
+      body.layout-b #map {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        border-radius: 0;
+      }
+
+      body.layout-b .map-controls {
+        z-index: 1000;
+        right: 24px;
+        bottom: 72px;
+        top: auto;
+        left: auto;
+      }
+
+      body.layout-b .map-controls button {
+        width: 44px;
+        height: 44px;
+        border: 0;
+        border-radius: 12px;
+        background: #fff;
+        color: var(--b-ink);
+        font-size: 20px;
+        box-shadow: 0 4px 14px rgb(19 32 29 / 16%);
+      }
+
+      body.layout-b .b-top-nav {
+        position: absolute;
+        z-index: 1000;
+        top: 24px;
+        right: 24px;
+        display: flex;
+        gap: 8px;
+      }
+
+      body.layout-b .b-top-nav a {
+        display: flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0 16px;
+        border-radius: 12px;
+        background: #fff;
+        color: var(--b-ink);
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: 0 4px 14px rgb(19 32 29 / 14%);
+      }
+
+      body.layout-b .b-top-nav a[aria-current="page"] {
+        background: var(--b-ink);
+        color: #fff;
+      }
+
+      body.layout-b .map-legend {
+        position: absolute;
+        z-index: 1000;
+        right: 24px;
+        bottom: 20px;
+        left: 448px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px 14px;
+        margin: 0;
+        padding: 0;
+        background: none;
+        font-size: 12px;
+        color: var(--b-ink);
+      }
+
+      body.layout-b .map-legend span {
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgb(255 255 255 / 92%);
+      }
+
+      body.layout-b .map-spot-popup {
+        z-index: 1100;
+        top: 88px;
+        right: 24px;
+        left: auto;
+        bottom: auto;
+        width: min(340px, calc(100% - 48px));
+        padding: 18px;
+        border: 0;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: 0 12px 34px rgb(19 32 29 / 24%);
+      }
+
+      body.layout-b .map-spot-popup h3 {
+        margin: 2px 0 0;
+        font-size: 20px;
+        font-weight: 900;
+      }
+
+      body.layout-b .map-spot-popup-category {
+        margin: 0;
+        color: var(--b-accent);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      body.layout-b .map-spot-popup-meta {
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: var(--b-soft);
+        font-size: 13px;
+      }
+
+      body.layout-b .map-spot-popup-details {
+        width: 100%;
+        min-height: 44px;
+        border-radius: 12px;
+      }
+
+      /* 左の板 */
+      body.layout-b .b-panel {
+        position: absolute;
+        z-index: 8;
+        top: 24px;
+        bottom: 24px;
+        left: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        width: 400px;
+        padding: 24px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        border-radius: 24px;
+        background: #fff;
+        box-shadow: 0 10px 40px rgb(19 32 29 / 18%);
+      }
+
+      body.layout-b .b-panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      body.layout-b .b-brand {
+        font-size: 22px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        color: var(--b-ink);
+      }
+
+      body.layout-b .b-count {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: var(--b-soft);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--b-muted);
+      }
+
+      body.layout-b .b-search {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      body.layout-b .b-search-row {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 52px;
+        padding: 0 6px 0 14px;
+        border-radius: 14px;
+        background: var(--b-soft);
+      }
+
+      body.layout-b .b-search-icon {
+        display: flex;
+        color: var(--b-muted);
+      }
+
+      body.layout-b .b-search-row input {
+        flex: 1;
+        min-width: 0;
+        height: 44px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        font-size: 16px;
+        box-shadow: none;
+      }
+
+      body.layout-b .b-search-row input:focus-visible {
+        outline: none;
+      }
+
+      body.layout-b .b-search-row:focus-within {
+        outline: 3px solid var(--b-accent);
+        outline-offset: 2px;
+      }
+
+      body.layout-b .b-search-row .place-suggestions {
+        top: calc(100% + 6px);
+        left: 0;
+        right: 0;
+        z-index: 20;
+      }
+
+      body.layout-b .b-icon-button {
+        display: flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: 0;
+        border-radius: 10px;
+        background: #fff;
+        color: var(--b-ink);
+        cursor: pointer;
+      }
+
+      body.layout-b .b-icon-button.b-accent {
+        background: var(--b-accent);
+        color: #fff;
+      }
+
+      body.layout-b .b-note,
+      body.layout-b .b-panel .panel-note,
+      body.layout-b .b-panel .transit-note {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.6;
+        color: var(--b-muted);
+      }
+
+      body.layout-b .b-note a {
+        text-decoration: underline;
+      }
+
+      body.layout-b .b-status {
+        display: block;
+        margin: 0;
+        padding: 0;
+        background: none;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--b-ink);
+      }
+
+      body.layout-b .b-block {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      body.layout-b .b-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--b-muted);
+      }
+
+      body.layout-b .b-segment {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 4px;
+        padding: 4px;
+        border-radius: 12px;
+        background: var(--b-soft);
+      }
+
+      body.layout-b .b-segment button {
+        min-height: 40px;
+        padding: 0 4px;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        color: var(--b-ink);
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      body.layout-b .b-segment button[aria-pressed="true"] {
+        background: var(--b-ink);
+        color: #fff;
+      }
+
+      body.layout-b .b-segment button:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      body.layout-b .b-heading {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 900;
+        letter-spacing: 0;
+      }
+
+      /* たたむ欄 */
+      body.layout-b .b-fold {
+        border: 2px solid var(--b-line);
+        border-radius: 14px;
+        background: #fff;
+      }
+
+      body.layout-b .b-fold > summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 48px;
+        padding: 0 14px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        list-style: none;
+      }
+
+      body.layout-b .b-fold > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      body.layout-b .b-fold > summary::after {
+        content: "＋";
+        color: var(--b-muted);
+      }
+
+      body.layout-b .b-fold[open] > summary::after {
+        content: "－";
+      }
+
+      body.layout-b .b-fold-body {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 0 14px 14px;
+      }
+
+      body.layout-b .b-panel .field label,
+      body.layout-b .b-panel .spot-kind-filter label {
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      body.layout-b .b-panel select,
+      body.layout-b .b-panel input[type="text"],
+      body.layout-b .b-panel input[type="time"],
+      body.layout-b .b-panel input[type="number"],
+      body.layout-b .b-panel .search-box {
+        min-height: 44px;
+        border-radius: 10px;
+      }
+
+      body.layout-b .b-panel .button {
+        min-height: 44px;
+        border-radius: 12px;
+      }
+
+      body.layout-b .b-panel .button-primary,
+      body.layout-b .map-spot-popup .button-primary {
+        border-color: var(--b-accent);
+        background: var(--b-accent);
+        color: #fff;
+      }
+
+      body.layout-b .b-panel .filter-button[aria-pressed="true"] {
+        border-color: var(--b-ink);
+        background: var(--b-ink);
+        color: #fff;
+      }
+
+      /* スポット一覧 */
+      body.layout-b .b-list-block .spot-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: none;
+        overflow: visible;
+        padding: 0;
+      }
+
+      body.layout-b .spot-card {
+        min-height: 56px;
+        padding: 12px;
+        border: 2px solid transparent;
+        border-radius: 14px;
+        background: var(--b-soft);
+        box-shadow: none;
+        color: var(--b-ink);
+      }
+
+      body.layout-b .spot-card:hover,
+      body.layout-b .spot-card.is-active {
+        border-color: var(--b-ink);
+        background: #fff;
+        transform: none;
+      }
+
+      body.layout-b .spot-card .spot-name {
+        font-weight: 900;
+      }
+
+      body.layout-b .spot-card .spot-meta {
+        color: var(--b-muted);
+      }
+
+      body.layout-b .spot-pagination button,
+      body.layout-b .spot-load-more {
+        min-height: 44px;
+        border-radius: 12px;
+      }
+
+      /* プランを作る */
+      body.layout-b .b-plan {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 4px;
+      }
+
+      body.layout-b .b-cta {
+        min-height: 52px;
+        border: 0;
+        border-radius: 14px;
+        background: var(--b-ink);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      body.layout-b .b-cta:disabled {
+        background: #9aa8a3;
+        cursor: not-allowed;
+      }
+
+      body.layout-b .b-footer {
+        margin-top: auto;
+        font-size: 11px;
+        line-height: 1.6;
+        color: var(--b-muted);
+      }
+
+      body.layout-b .b-footer a {
+        text-decoration: underline;
+      }
+
+      /* タブレット・スマホ */
+      @media (max-width: 860px) {
+        body.layout-b .b-app {
+          height: auto;
+          overflow: visible;
+        }
+
+        body.layout-b .b-map-area {
+          position: relative;
+          z-index: auto;
+          height: 56vh;
+          min-height: 340px;
+          isolation: auto;
+        }
+
+        body.layout-b .b-map-area .map-wrap {
+          z-index: 0;
+          isolation: isolate;
+        }
+
+        body.layout-b .b-top-nav {
+          position: fixed;
+          z-index: 30;
+          top: auto;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 0;
+          padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+          border-top: 1px solid var(--b-line);
+          background: #fff;
+        }
+
+        body.layout-b .b-top-nav a {
+          justify-content: center;
+          min-height: 48px;
+          padding: 0 4px;
+          border-radius: 10px;
+          box-shadow: none;
+          font-size: 12px;
+        }
+
+        body.layout-b .b-top-nav a[aria-current="page"] {
+          background: transparent;
+          color: var(--b-accent);
+          font-weight: 900;
+        }
+
+        body.layout-b .map-legend {
+          display: none;
+        }
+
+        body.layout-b .map-controls {
+          right: 12px;
+          bottom: 36px;
+        }
+
+        body.layout-b .map-spot-popup {
+          top: 12px;
+          right: 12px;
+          width: calc(100% - 24px);
+        }
+
+        body.layout-b .b-panel {
+          position: relative;
+          top: auto;
+          bottom: auto;
+          left: auto;
+          width: auto;
+          margin-top: -20px;
+          padding: 20px 16px 88px;
+          overflow: visible;
+          border-radius: 24px 24px 0 0;
+          box-shadow: 0 -6px 30px rgb(19 32 29 / 16%);
+        }
+      }
     </style>
   </head>
-  <body>
-    <header class="site-header">
-      <a class="brand" href="#top" aria-label="よりみち日和 ホーム">
-        <span class="brand-mark" aria-hidden="true">Y</span>
-        <span>YORIMICHI BIYORI</span>
-      </a>
-      <nav class="site-nav" aria-label="メインナビゲーション">
-        <a href="#planner">地図・プラン</a>
-        <a href="route.html">経路</a>
-        <a href="places.html">お店・施設</a>
-        <a href="events.html">イベント</a>
-      </nav>
-    </header>
-
-    <main>
-      <section class="hero" id="top" aria-labelledby="hero-title">
-        <div class="hero-content">
-          <p class="eyebrow">JAPAN DAY TRIP GUIDE</p>
-          <h1 id="hero-title">今日は、<br>どこへ寄り道する？</h1>
-          <p class="hero-copy">
-            北海道から沖縄まで、今いる場所からも旅行先からも。<br>
-            日本全国のスポットを地図から探して、お出かけプランを見つけよう。
-          </p>
-          <a class="hero-cta" href="#planner">地図から探す <span aria-hidden="true">↓</span></a>
-        </div>
-        <span class="hero-caption">SEA · CITY · MOUNTAIN</span>
-      </section>
-
-      <section class="planner" id="planner" aria-labelledby="planner-title">
-        <div class="section-heading">
-          <div>
-            <p class="section-kicker">PLAN YOUR LITTLE ESCAPE</p>
-            <h2 id="planner-title">地図から、次の目的地を。</h2>
+  <body class="layout-b">
+    <div class="b-app">
+      <div class="b-map-area" id="top">
+        <div class="map-wrap">
+          <div id="map" role="region" aria-label="日本全国のおすすめスポット地図">
+            <div class="map-fallback" id="map-fallback">
+              <svg id="map-svg" viewBox="0 0 900 680" role="group" aria-label="日本列島とおすすめスポットの位置図"></svg>
+            </div>
+            <div class="map-controls" role="group" aria-label="地図の拡大縮小">
+              <button type="button" id="zoom-in" aria-label="地図を拡大">+</button>
+              <button type="button" id="zoom-out" aria-label="地図を縮小">−</button>
+              <button type="button" id="zoom-reset" aria-label="全国表示に戻す">⌂</button>
+            </div>
+            <div class="map-offline-note" id="map-offline-note" role="status">
+              道路地図を読み込めないため、概略図を表示しています。詳細地図にはインターネット接続が必要です。
+            </div>
           </div>
-          <p class="section-description">
-            地名・駅・空港を検索するか現在地を使って、周辺のスポットを表示。
-            マーカーを選ぶと概要が表示され、「詳しく見る」から詳細ページへ移動できます。
-          </p>
+          <section class="map-spot-popup" id="map-spot-popup" aria-labelledby="map-popup-name" aria-live="polite" hidden>
+            <div class="map-spot-popup-heading">
+              <div>
+                <p class="map-spot-popup-category" id="map-popup-category"></p>
+                <h3 id="map-popup-name"></h3>
+              </div>
+              <button class="map-spot-popup-close" id="map-popup-close" type="button" aria-label="スポット概要を閉じる">×</button>
+            </div>
+            <p class="map-spot-popup-description" id="map-popup-description"></p>
+            <p class="map-spot-popup-meta" id="map-popup-meta"></p>
+            <button class="button button-primary map-spot-popup-details" id="map-popup-details" type="button">詳しく見る</button>
+          </section>
         </div>
-        <nav class="planner-steps" aria-label="お出かけプランの手順">
-          <a href="#map"><span>01</span>場所を決める</a>
-          <a href="#spot-heading"><span>02</span>スポットを選ぶ</a>
-          <a href="#route-heading"><span>03</span>時間と経路を組む</a>
+
+        <nav class="b-top-nav" aria-label="メインナビゲーション">
+          <a href="#planner" aria-current="page">地図</a>
+          <a href="route.html">経路</a>
+          <a href="places.html">お店・施設</a>
+          <a href="events.html">イベント</a>
         </nav>
 
-        <div class="planner-layout">
-          <div class="map-column">
-            <div class="map-toolbar">
-              <div class="location-status" id="location-status" role="status" aria-live="polite">
-                全国27,039か所の観光・余暇スポットを表示中
-              </div>
-              <button class="button" type="button" id="locate-button" aria-label="現在地を中心に拡大して表示">
-                <span aria-hidden="true">◎</span> 現在地を中心に表示
-              </button>
+        <div class="map-legend" aria-label="地図の凡例">
+          <span><i class="legend-dot" aria-hidden="true"></i> おすすめスポット</span>
+          <span><i class="legend-dot location" aria-hidden="true"></i> 出発地</span>
+          <span id="range-legend"><i class="legend-ring" aria-hidden="true"></i> 20 km以内</span>
+          <span id="map-source-label">日本列島の概略図 · オンライン時は道路地図を表示</span>
+        </div>
+      </div>
+
+      <aside class="b-panel" id="planner" aria-label="スポットとプランの設定">
+        <div class="b-panel-head">
+          <a class="b-brand" href="#top" aria-label="よりみち日和 ホーム">よりみち日和</a>
+          <span class="b-count" id="result-count">スポットを表示</span>
+        </div>
+
+        <form class="b-search" id="place-search-form">
+          <label class="b-visually-hidden" for="place-query">駅・空港・地名でさがす</label>
+          <div class="b-search-row autocomplete-wrap">
+            <span class="b-search-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+            </span>
+            <input id="place-query" type="search" placeholder="駅・空港・地名でさがす（例：京都駅）" aria-describedby="place-search-note" required>
+            <div class="place-suggestions" id="place-query-suggestions" role="listbox" aria-label="場所の候補" hidden></div>
+            <button class="b-icon-button" id="place-search-button" type="submit" aria-label="周辺を検索">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+            </button>
+            <button class="b-icon-button b-accent" type="button" id="locate-button" aria-label="現在地を中心に表示">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
+            </button>
+          </div>
+          <p class="b-note" id="place-search-note" role="status" aria-live="polite">
+            場所の候補は <a href="https://photon.komoot.io/" target="_blank" rel="noopener noreferrer">Photon</a>（OpenStreetMapデータ）を使います。
+          </p>
+          <div class="b-status location-status" id="location-status" role="status" aria-live="polite">
+            全国27,039か所の観光・余暇スポットを表示中
+          </div>
+        </form>
+
+        <div class="b-block">
+          <span class="b-label" id="b-range-label">範囲</span>
+          <div class="b-segment" role="group" aria-labelledby="b-range-label" id="b-range-chips">
+            <button type="button" data-radius="20">20 km</button>
+            <button type="button" data-radius="50">50 km</button>
+            <button type="button" data-radius="100">100 km</button>
+            <button type="button" data-radius="200">200 km</button>
+            <button type="button" data-radius="all">全国</button>
+          </div>
+        </div>
+
+        <details class="b-fold">
+          <summary>くわしくしぼる（種類・時間・名前）</summary>
+          <div class="b-fold-body">
+            <div class="field nearby-radius">
+              <label for="nearby-search-mode">検索条件</label>
+              <select id="nearby-search-mode">
+                <option value="distance" selected>距離で探す</option>
+                <option value="time">所要時間の目安で探す</option>
+              </select>
             </div>
-            <form class="location-search" id="place-search-form">
-              <label for="place-query">旅行先の地名・駅・空港から周辺検索</label>
-              <div class="location-search-controls autocomplete-wrap">
-                <input id="place-query" type="search" placeholder="例：神戸空港、京都駅" aria-describedby="place-search-note" required>
-                <div class="place-suggestions" id="place-query-suggestions" role="listbox" aria-label="場所の候補" hidden></div>
-                <button class="button button-primary" id="place-search-button" type="submit">周辺を検索</button>
-              </div>
-              <p class="location-search-note" id="place-search-note" role="status" aria-live="polite">
-                入力中に場所候補を表示します。検索は <a href="https://photon.komoot.io/" target="_blank" rel="noopener noreferrer">Photon</a>（OpenStreetMapデータ）を利用します。
-              </p>
-            </form>
-            <div class="map-wrap">
-              <div id="map" role="region" aria-label="日本全国のおすすめスポット地図">
-                <div class="map-fallback" id="map-fallback">
-                  <svg id="map-svg" viewBox="0 0 900 680" role="group" aria-label="日本列島とおすすめスポットの位置図"></svg>
-                </div>
-                <div class="map-controls" role="group" aria-label="地図の拡大縮小">
-                  <button type="button" id="zoom-in" aria-label="地図を拡大">+</button>
-                  <button type="button" id="zoom-out" aria-label="地図を縮小">−</button>
-                  <button type="button" id="zoom-reset" aria-label="全国表示に戻す">⌂</button>
-                </div>
-                <div class="map-offline-note" id="map-offline-note" role="status">
-                  道路地図を読み込めないため、概略図を表示しています。詳細地図にはインターネット接続が必要です。
-                </div>
-              </div>
-              <section class="map-spot-popup" id="map-spot-popup" aria-labelledby="map-popup-name" aria-live="polite" hidden>
-                <div class="map-spot-popup-heading">
-                  <div>
-                    <p class="map-spot-popup-eyebrow">SELECTED SPOT</p>
-                    <h3 id="map-popup-name"></h3>
-                  </div>
-                  <button class="map-spot-popup-close" id="map-popup-close" type="button" aria-label="スポット概要を閉じる">×</button>
-                </div>
-                <p class="map-spot-popup-category" id="map-popup-category"></p>
-                <p class="map-spot-popup-description" id="map-popup-description"></p>
-                <p class="map-spot-popup-meta" id="map-popup-meta"></p>
-                <button class="button button-primary map-spot-popup-details" id="map-popup-details" type="button">詳しく見る ↗</button>
-              </section>
+            <div class="field nearby-radius" id="nearby-distance-control">
+              <label for="nearby-radius">出発地から探す範囲</label>
+              <select id="nearby-radius">
+                <option value="20" selected>20 km以内</option>
+                <option value="50">50 km以内</option>
+                <option value="100">100 km以内</option>
+                <option value="200">200 km以内</option>
+                <option value="all">全国</option>
+              </select>
             </div>
-            <div class="map-legend" aria-label="地図の凡例">
-              <span><i class="legend-dot" aria-hidden="true"></i> おすすめスポット</span>
-              <span><i class="legend-dot location" aria-hidden="true"></i> 現在地・設定した出発地</span>
-              <span id="range-legend"><i class="legend-ring" aria-hidden="true"></i> 20 km以内</span>
-              <span id="map-source-label">日本列島の概略図 · オンライン時は道路地図を表示</span>
+            <div class="field nearby-radius" id="nearby-time-control" hidden>
+              <label for="nearby-time">移動時間の目安</label>
+              <select id="nearby-time">
+                <option value="30">30分以内</option>
+                <option value="60" selected>1時間以内</option>
+                <option value="90">1時間30分以内</option>
+                <option value="120">2時間以内</option>
+              </select>
+              <span class="panel-note">移動手段は「経路を調べる」の設定を使います</span>
+            </div>
+            <label class="search-box">
+              <span class="search-icon" aria-hidden="true">⌕</span>
+              <input id="spot-search" type="search" placeholder="スポット名・エリアで検索" aria-label="スポット名・エリアで検索">
+            </label>
+            <div class="field spot-kind-filter">
+              <label for="spot-kind-filter">スポット種別</label>
+              <select id="spot-kind-filter">
+                <option value="all">すべての種別</option>
+                <option value="shrine">神社</option>
+                <option value="attraction">観光スポット</option>
+                <option value="facility">施設・ミュージアム</option>
+                <option value="station">主要駅</option>
+                <option value="airport">空港</option>
+              </select>
+            </div>
+            <div class="filters" role="group" aria-label="スポットの種類">
+              <button class="filter-button" type="button" data-filter="all" aria-pressed="true">すべて</button>
+              <button class="filter-button" type="button" data-filter="nature" aria-pressed="false">自然・海</button>
+              <button class="filter-button" type="button" data-filter="culture" aria-pressed="false">文化・街</button>
+              <button class="filter-button" type="button" data-filter="relax" aria-pressed="false">癒やし</button>
+            </div>
+            <p class="panel-note">移動時間と時間検索の円は、直線距離と移動手段別の速度による概算です。実際の道路・公共交通の経路や発車時刻は反映しません。</p>
+          </div>
+        </details>
+
+        <section class="b-block b-list-block" aria-labelledby="spot-heading">
+          <h1 class="b-heading" id="spot-heading">この近くの寄り道</h1>
+          <p class="b-note" id="nearby-data-note" role="status" aria-live="polite">20 km以内のおすすめを距離順に表示します。条件はあとから変更できます。</p>
+          <div class="spot-list" id="spot-list" aria-label="スポット一覧"></div>
+          <div class="empty-state" id="empty-state">条件に合うスポットがありません。検索語やカテゴリを変えてみてください。</div>
+        </section>
+
+        <details class="b-fold">
+          <summary>選んだスポット</summary>
+          <div class="b-fold-body">
+            <div class="detail-card" id="spot-detail" aria-live="polite">
+              <div class="detail-icon" id="detail-icon" aria-hidden="true">🕰️</div>
+              <div>
+                <h4 id="detail-name">札幌市時計台</h4>
+                <p class="detail-category" id="detail-category">文化・街 · 北海道・札幌</p>
+                <p class="detail-description" id="detail-description">札幌の街なかに残る歴史的建造物。大通公園や赤れんが庁舎とあわせて巡れます。</p>
+                <p class="detail-timing" id="detail-timing">滞在 約75分 · 入場待ち 約20分</p>
+              </div>
+            </div>
+            <div class="transport-shortcuts">
+              <button class="button button-primary details-button" type="button" id="spot-detail-button">詳しく見る</button>
+              <a class="button" id="spot-map-link" href="https://www.google.com/maps/search/?api=1&amp;query=%E6%9C%AD%E5%B9%8C%E5%B8%82%E6%99%82%E8%A8%88%E5%8F%B0">Googleマップで場所を見る ↗</a>
+              <a class="button" id="spot-directions-link" href="https://www.google.com/maps/dir/?api=1&amp;destination=%E6%9C%AD%E5%B9%8C%E5%B8%82%E6%99%82%E8%A8%88%E5%8F%B0">Googleマップで経路を見る ↗</a>
+              <button class="button" type="button" id="use-destination-button">この場所を到着地にする</button>
+              <button class="button" type="button" id="use-origin-button">この場所を出発地にする</button>
             </div>
           </div>
+        </details>
 
-          <aside class="side-column" aria-label="スポットと経路の設定">
-            <section class="panel journey-panel" id="travel-info" aria-labelledby="route-heading">
-              <div class="panel-heading">
-                <div>
-                  <p class="panel-eyebrow">JOURNEY SETUP</p>
-                  <h3 id="route-heading">出発地からプランをつくる</h3>
-                </div>
-                <span class="step-index">01</span>
-              </div>
-              <form class="route-form" id="route-form">
-                <div class="field">
-                  <label for="origin">出発地</label>
-                  <div class="origin-input-row">
-                    <div class="autocomplete-field">
-                      <input id="origin" type="text" value="東京駅" autocomplete="street-address" placeholder="現在地・駅名・住所を入力">
-                      <div class="place-suggestions" id="origin-suggestions" role="listbox" aria-label="出発地の候補" hidden></div>
-                    </div>
-                    <button class="button current-location-button" type="button" id="use-current-origin" aria-label="現在地を出発地に入力">
-                      <span aria-hidden="true">◎</span>現在地
-                    </button>
-                  </div>
-                </div>
-                <div class="field">
-                  <label for="destination">目的地</label>
+        <details class="b-fold" id="travel-info">
+          <summary id="route-heading">経路を調べる（出発地・目的地・移動手段）</summary>
+          <div class="b-fold-body">
+            <form class="route-form" id="route-form">
+              <div class="field">
+                <label for="origin">出発地</label>
+                <div class="origin-input-row">
                   <div class="autocomplete-field">
-                    <input id="destination" type="text" value="札幌市時計台" placeholder="目的地を入力、候補から選択">
-                    <div class="place-suggestions" id="destination-suggestions" role="listbox" aria-label="目的地の候補" hidden></div>
+                    <input id="origin" type="text" value="東京駅" autocomplete="street-address" placeholder="現在地・駅名・住所を入力">
+                    <div class="place-suggestions" id="origin-suggestions" role="listbox" aria-label="出発地の候補" hidden></div>
                   </div>
+                  <button class="button current-location-button" type="button" id="use-current-origin" aria-label="現在地を出発地に入力">現在地</button>
                 </div>
-                <div class="field">
-                  <label for="travel-mode">移動手段</label>
-                  <select id="travel-mode">
-                    <option value="transit">電車・公共交通</option>
-                    <option value="driving">車</option>
-                    <option value="walking">徒歩</option>
-                    <option value="bicycling">自転車</option>
-                  </select>
-                </div>
-                <button class="button button-primary route-link" type="submit">経路・時刻を地図で確認 <span aria-hidden="true">↗</span></button>
-                <p class="transit-note">
-                  実際の電車の発車時刻・乗換・運行状況は、Google マップで確認できます。
-                </p>
-              </form>
-              <div class="transport-shortcuts">
-                <a class="button" href="https://www.google.com/travel/flights" target="_blank" rel="noopener noreferrer">航空便を検索 ↗</a>
-                <a class="button" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Google マップ ↗</a>
-                <a class="button" href="route.html" id="route-page-link">別ページで経路を調べる ↗</a>
               </div>
-
-              <div class="panel-divider" role="separator"></div>
-              <div class="panel-heading">
-                <div>
-                  <p class="panel-eyebrow">TIME-BOXED PLAN</p>
-                  <h3 id="plan-heading">開始・終了時刻を決める</h3>
+              <div class="field">
+                <label for="destination">目的地</label>
+                <div class="autocomplete-field">
+                  <input id="destination" type="text" value="札幌市時計台" placeholder="目的地を入力、候補から選択">
+                  <div class="place-suggestions" id="destination-suggestions" role="listbox" aria-label="目的地の候補" hidden></div>
                 </div>
-                <span class="step-index">02</span>
               </div>
-              <div class="route-form">
-                <div class="field">
-                  <label for="plan-start-time">出発時刻</label>
-                  <div class="time-controls">
-                    <input id="plan-start-time" type="time" step="300" required>
-                    <button class="button" id="set-current-time" type="button">今から</button>
-                  </div>
-                </div>
-                <div class="field">
-                  <label for="plan-end-time">終了時刻</label>
-                  <input id="plan-end-time" type="time" step="300" required>
-                  <p class="panel-note">終了が開始より早い時刻の場合は、翌日の終了として扱います。</p>
-                </div>
-                <div class="field">
-                  <label for="budget">予算（任意・1人あたり）</label>
-                  <input id="budget" type="number" min="0" step="500" inputmode="numeric" placeholder="例：10,000円">
-                </div>
-                <button class="button button-primary route-link build-plan-button" id="build-plan" type="button" disabled>
-                  この条件でプランを作成 <span aria-hidden="true">↗</span>
-                </button>
-                <p class="panel-note">地図で選んだスポットは最初の立ち寄り先として優先します。未選択なら検索範囲の近い候補から組み立て、3時間以上は45分の食事休憩も含めます。</p>
-              </div>
-              <div class="plan-result" id="plan-result" aria-live="polite">
-                <p class="weather-message">現在地を取得するか、地図上のスポットを出発地にするとプランを作成できます。</p>
-              </div>
-            </section>
-
-            <section class="panel spot-search-panel" aria-labelledby="spot-heading">
-              <div class="panel-heading">
-                <div>
-                  <p class="panel-eyebrow">NEARBY PICKS</p>
-                  <h3 id="spot-heading">周辺のおすすめスポット</h3>
-                </div>
-                <span class="result-count" id="result-count">スポットを表示</span>
-              </div>
-              <div class="field nearby-radius">
-                <label for="nearby-search-mode">検索条件</label>
-                <select id="nearby-search-mode">
-                  <option value="distance" selected>距離で探す</option>
-                  <option value="time">所要時間の目安で探す</option>
+              <div class="field">
+                <label for="travel-mode">移動手段</label>
+                <select id="travel-mode">
+                  <option value="transit">電車・公共交通</option>
+                  <option value="driving">車</option>
+                  <option value="walking">徒歩</option>
+                  <option value="bicycling">自転車</option>
                 </select>
               </div>
-              <div class="field nearby-radius" id="nearby-distance-control">
-                <label for="nearby-radius">出発地から探す範囲</label>
-                <select id="nearby-radius">
-                  <option value="20" selected>20 km以内</option>
-                  <option value="50">50 km以内</option>
-                  <option value="100">100 km以内</option>
-                  <option value="200">200 km以内</option>
-                  <option value="all">全国</option>
-                </select>
-              </div>
-              <div class="field nearby-radius" id="nearby-time-control" hidden>
-                <label for="nearby-time">移動時間の目安</label>
-                <select id="nearby-time">
-                  <option value="30">30分以内</option>
-                  <option value="60" selected>1時間以内</option>
-                  <option value="90">1時間30分以内</option>
-                  <option value="120">2時間以内</option>
-                </select>
-                <span class="panel-note">移動手段は「行き方を調べる」の設定を使います</span>
-              </div>
-              <p class="panel-note">移動時間と時間検索の円は、直線距離と移動手段別の速度による概算です。実際の道路・公共交通の経路や発車時刻は反映しません。</p>
-              <p class="panel-note" id="nearby-data-note" role="status" aria-live="polite">20 km以内のおすすめを距離順に表示します。条件はあとから変更できます。</p>
-              <label class="search-box">
-                <span class="search-icon" aria-hidden="true">⌕</span>
-                <input id="spot-search" type="search" placeholder="スポット名・エリアで検索" aria-label="スポット名・エリアで検索">
-              </label>
-              <div class="field spot-kind-filter">
-                <label for="spot-kind-filter">スポット種別</label>
-                <select id="spot-kind-filter">
-                  <option value="all">すべての種別</option>
-                  <option value="shrine">神社</option>
-                  <option value="attraction">観光スポット</option>
-                  <option value="facility">施設・ミュージアム</option>
-                  <option value="station">主要駅</option>
-                  <option value="airport">空港</option>
-                </select>
-              </div>
-              <div class="filters" role="group" aria-label="スポットの種類">
-                <button class="filter-button" type="button" data-filter="all" aria-pressed="true">すべて</button>
-                <button class="filter-button" type="button" data-filter="nature" aria-pressed="false">自然・海</button>
-                <button class="filter-button" type="button" data-filter="culture" aria-pressed="false">文化・街</button>
-                <button class="filter-button" type="button" data-filter="relax" aria-pressed="false">癒やし</button>
-              </div>
-              <div class="spot-list" id="spot-list" aria-label="スポット一覧"></div>
-              <div class="empty-state" id="empty-state">条件に合うスポットがありません。検索語やカテゴリを変えてみてください。</div>
-            </section>
-
-            <section class="panel" aria-labelledby="selected-heading">
-              <div class="panel-heading">
-                <div>
-                  <p class="panel-eyebrow">SPOT DETAIL</p>
-                  <h3 id="selected-heading">選択したスポット</h3>
-                </div>
-              </div>
-              <div class="detail-card" id="spot-detail" aria-live="polite">
-                <div class="detail-icon" id="detail-icon" aria-hidden="true">🕰️</div>
-                <div>
-                  <h4 id="detail-name">札幌市時計台</h4>
-                  <p class="detail-category" id="detail-category">文化・街 · 北海道・札幌</p>
-                  <p class="detail-description" id="detail-description">札幌の街なかに残る歴史的建造物。大通公園や赤れんが庁舎とあわせて巡れます。</p>
-                  <p class="detail-timing" id="detail-timing">滞在 約75分 · 入場待ち 約20分</p>
-                </div>
-              </div>
-              <div class="transport-shortcuts">
-                <button class="button button-primary details-button" type="button" id="spot-detail-button">詳しく見る ↗</button>
-                <a class="button" id="spot-map-link" href="https://www.google.com/maps/search/?api=1&amp;query=%E6%9C%AD%E5%B9%8C%E5%B8%82%E6%99%82%E8%A8%88%E5%8F%B0">Googleマップで場所を見る ↗</a>
-                <a class="button" id="spot-directions-link" href="https://www.google.com/maps/dir/?api=1&amp;destination=%E6%9C%AD%E5%B9%8C%E5%B8%82%E6%99%82%E8%A8%88%E5%8F%B0">Googleマップで経路を見る ↗</a>
-                <button class="button" type="button" id="use-destination-button">この場所を到着地にする</button>
-                <button class="button" type="button" id="use-origin-button">この場所を出発地にする</button>
-              </div>
-            </section>
-            <section class="panel weather-panel" aria-labelledby="weather-heading">
-              <div class="panel-heading">
-                <div>
-                  <p class="panel-eyebrow">LIVE WEATHER</p>
-                  <h3 id="weather-heading">出発地周辺の天気</h3>
-                </div>
-                <span class="result-count">Open-Meteo</span>
-              </div>
-              <div id="weather-content" aria-live="polite">
-                <p class="weather-message" id="weather-message">現在地を取得するか、スポットを出発地に設定すると周辺の天気と気温を表示します。</p>
-              </div>
-              <p class="panel-note">天気情報：<a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>。現在の観測・予報値です。</p>
-            </section>
-          </aside>
-        </div>
-      </section>
-
-      <section class="itinerary" aria-labelledby="itinerary-title">
-        <div class="itinerary-inner">
-          <div class="itinerary-card">
-            <div>
-              <p class="section-kicker">YOUR NEXT LITTLE ADVENTURE</p>
-              <h2 id="itinerary-title">寄り道から、旅がはじまる。</h2>
-              <p>気になるスポットを見つけたら、地図で位置を確認。経路や最新の交通情報は各サービスでチェックして、あなただけのお出かけを。</p>
+              <button class="button button-primary route-link" type="submit">経路・時刻を地図で確認 <span aria-hidden="true">↗</span></button>
+              <p class="transit-note">実際の電車の発車時刻・乗換・運行状況は、Google マップで確認できます。</p>
+            </form>
+            <div class="transport-shortcuts">
+              <a class="button" href="https://www.google.com/travel/flights" target="_blank" rel="noopener noreferrer">航空便を検索 ↗</a>
+              <a class="button" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Google マップ ↗</a>
+              <a class="button" href="route.html" id="route-page-link">別ページで経路を調べる ↗</a>
             </div>
-            <a class="button" href="#planner">スポットを探す ↑</a>
           </div>
-        </div>
-      </section>
-    </main>
+        </details>
 
-    <footer>
-      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">Y</span><span>YORIMICHI BIYORI</span></a>
-      <span>日本全国のお出かけプラン提案サイト</span>
-      <span>スポットデータ：
-        <a href="https://www.wikidata.org/wiki/Wikidata:Copyright" target="_blank" rel="noopener noreferrer">Wikidata（CC0）</a>・
-        <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a>（
-        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>、地域ラベル）
-      </span>
-    </footer>
+        <details class="b-fold">
+          <summary id="weather-heading">出発地の天気</summary>
+          <div class="b-fold-body">
+            <div id="weather-content" aria-live="polite">
+              <p class="weather-message" id="weather-message">現在地を取得するか、スポットを出発地に設定すると周辺の天気と気温を表示します。</p>
+            </div>
+            <p class="panel-note">天気情報：<a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>。現在の観測・予報値です。</p>
+          </div>
+        </details>
+
+        <section class="b-plan" aria-labelledby="plan-heading">
+          <details class="b-fold b-fold-plain">
+            <summary id="plan-heading">プランの時刻と予算</summary>
+            <div class="b-fold-body route-form">
+              <div class="field">
+                <label for="plan-start-time">出発時刻</label>
+                <div class="time-controls">
+                  <input id="plan-start-time" type="time" step="300" required>
+                  <button class="button" id="set-current-time" type="button">今から</button>
+                </div>
+              </div>
+              <div class="field">
+                <label for="plan-end-time">終了時刻</label>
+                <input id="plan-end-time" type="time" step="300" required>
+                <p class="panel-note">終了が開始より早い時刻の場合は、翌日の終了として扱います。</p>
+              </div>
+              <div class="field">
+                <label for="budget">予算（任意・1人あたり）</label>
+                <input id="budget" type="number" min="0" step="500" inputmode="numeric" placeholder="例：10,000円">
+              </div>
+              <p class="panel-note">地図で選んだスポットは最初の立ち寄り先として優先します。未選択なら検索範囲の近い候補から組み立て、3時間以上は45分の食事休憩を入れます。</p>
+            </div>
+          </details>
+          <button class="b-cta build-plan-button" id="build-plan" type="button" disabled>ここからプランを作る</button>
+          <div class="plan-result" id="plan-result" aria-live="polite">
+            <p class="weather-message">現在地を取得するか、地図上のスポットを出発地にするとプランを作成できます。</p>
+          </div>
+        </section>
+
+        <footer class="b-footer">
+          <span>スポットデータ：
+            <a href="https://www.wikidata.org/wiki/Wikidata:Copyright" target="_blank" rel="noopener noreferrer">Wikidata（CC0）</a>・
+            <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a>（<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>、地域ラベル）
+          </span>
+        </footer>
+      </aside>
+    </div>
 
     <script src="wikidata-spots.js"></script>
     <script>
@@ -4989,7 +5519,7 @@
               }).addTo(realMap).bindPopup(`${originLabel}（出発地）`);
               realMap.setView([latitude, longitude], 13);
             } else {
-              realMap.fitBounds([[24, 122], [46, 147]], { padding: [14, 14] });
+              realMap.fitBounds([[24, 122], [46, 147]], (window.innerWidth > 860 ? { paddingTopLeft: [448, 24], paddingBottomRight: [24, 24] } : { padding: [14, 14] }));
             }
           } else if (insideJapan) {
             setMapView(latitude, longitude, 12);
@@ -5039,7 +5569,7 @@
           try {
             realMap = L.map("map", { zoomControl: false, scrollWheelZoom: true });
             const japanBounds = L.latLngBounds([24, 122], [46, 147]);
-            realMap.fitBounds(japanBounds, { padding: [14, 14] });
+            realMap.fitBounds(japanBounds, (window.innerWidth > 860 ? { paddingTopLeft: [448, 24], paddingBottomRight: [24, 24] } : { padding: [14, 14] }));
             const tiles = L.maplibreGL({
               style: "https://tiles.openfreemap.org/styles/liberty",
               attribution: '<a href="https://openfreemap.org/">OpenFreeMap</a> · &copy; <a href="https://www.openmaptiles.org/">OpenMapTiles</a> · Data from <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -5708,13 +6238,46 @@
           else setMapView(mapCenter.lat, mapCenter.lng, mapScale / 1.4);
         });
         document.getElementById("zoom-reset").addEventListener("click", () => {
-          if (realMapReady && realMap) realMap.fitBounds([[24, 122], [46, 147]], { padding: [14, 14] });
+          if (realMapReady && realMap) realMap.fitBounds([[24, 122], [46, 147]], (window.innerWidth > 860 ? { paddingTopLeft: [448, 24], paddingBottomRight: [24, 24] } : { padding: [14, 14] }));
           else setMapView(35.5, 135.5, 1);
         });
         renderSpots();
         selectSpot(selectedSpot, false);
         loadRealMap();
         requestCurrentLocation();
+      })();
+    </script>
+    <script>
+      // 案B：範囲のボタンと、元の「出発地から探す範囲」の選択肢をつなぐ
+      (() => {
+        const select = document.getElementById("nearby-radius");
+        const modeSelect = document.getElementById("nearby-search-mode");
+        const chips = Array.from(document.querySelectorAll("#b-range-chips button"));
+        if (!select || !chips.length) return;
+
+        const sync = () => {
+          const byTime = modeSelect && modeSelect.value === "time";
+          chips.forEach((chip) => {
+            chip.setAttribute("aria-pressed", String(!byTime && chip.dataset.radius === select.value));
+            chip.disabled = byTime;
+          });
+        };
+
+        chips.forEach((chip) => {
+          chip.addEventListener("click", () => {
+            if (select.value === chip.dataset.radius) return;
+            select.value = chip.dataset.radius;
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+            sync();
+          });
+        });
+
+        select.addEventListener("change", sync);
+        if (modeSelect) modeSelect.addEventListener("change", sync);
+        // 元のしくみが範囲を自動で変えたとき（現在地を使ったときなど）も合わせる
+        document.addEventListener("click", () => setTimeout(sync, 0));
+        setInterval(sync, 1000);
+        sync();
       })();
     </script>
   </body>
