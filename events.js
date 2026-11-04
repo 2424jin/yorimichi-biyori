@@ -1,0 +1,21 @@
+window.YorimichiEvents = [
+  { id: "meguro-cherry", name: "目黒川の桜", region: "東京", months: [3, 4], lat: 35.6333, lng: 139.699, detail: "桜の見頃に合わせて周辺で催しが行われる年があります。" },
+  { id: "sanja-festival", name: "三社祭", region: "東京", months: [5], lat: 35.7148, lng: 139.7967, detail: "浅草神社の例大祭。日程・交通規制は公式情報をご確認ください。" },
+  { id: "sumida-fireworks", name: "隅田川花火大会", region: "東京", months: [7], lat: 35.7101, lng: 139.801, detail: "夏季開催の花火大会。開催日や観覧方法は年ごとに異なります。" },
+  { id: "jingu-fireworks", name: "神宮外苑花火大会", region: "東京", months: [8], lat: 35.673, lng: 139.717, detail: "都心で開催される夏の花火大会。開催有無・日程は公式発表をご確認ください。" },
+  { id: "marunouchi-illumination", name: "丸の内イルミネーション", region: "東京", months: [11, 12, 1, 2], lat: 35.6812, lng: 139.763, detail: "冬季の街路イルミネーション。点灯期間は公式情報をご確認ください。" },
+  { id: "keyakizaka-illumination", name: "六本木ヒルズ けやき坂イルミネーション", region: "東京", months: [11, 12], lat: 35.6604, lng: 139.7292, detail: "冬季に開催されるイルミネーションの例年の目安です。" },
+  { id: "yokohama-port-festival", name: "横浜開港祭", region: "神奈川", months: [6], lat: 35.4548, lng: 139.638, detail: "横浜港の開港を記念するイベント。日程・プログラムは公式情報をご確認ください。" },
+  { id: "yokohama-christmas-market", name: "横浜赤レンガ倉庫 クリスマスマーケット", region: "神奈川", months: [11, 12], lat: 35.4524, lng: 139.6425, detail: "冬季開催のマーケット。開催期間・入場方法は公式情報をご確認ください。" },
+  { id: "tamagawa-fireworks", name: "川崎市制記念 多摩川花火大会", region: "神奈川", months: [10], lat: 35.608, lng: 139.604, detail: "秋季に開催される年がある花火大会。開催情報をご確認ください。" },
+  { id: "gion-festival", name: "京都・祇園祭", region: "京都", months: [7], lat: 35.0036, lng: 135.7681, detail: "7月に行われる祭礼。各行事の日程・会場は公式情報をご確認ください。" },
+  { id: "tenjin-festival", name: "大阪・天神祭", region: "大阪", months: [7], lat: 34.6963, lng: 135.5197, detail: "大阪天満宮の祭礼。船渡御などの開催情報をご確認ください。" },
+  { id: "naniwa-fireworks", name: "なにわ淀川花火大会", region: "大阪", months: [8], lat: 34.711, lng: 135.477, detail: "夏季開催の花火大会。開催日・観覧規制は公式情報をご確認ください。" },
+  { id: "kobe-luminarie", name: "神戸ルミナリエ", region: "兵庫", months: [1, 2], lat: 34.6885, lng: 135.1955, detail: "冬季開催の光のイベント。開催時期・会場は年ごとに確認してください。" },
+  { id: "hakata-yamakasa", name: "博多祇園山笠", region: "福岡", months: [7], lat: 33.5902, lng: 130.4108, detail: "博多の伝統行事。行事日程と交通規制は公式情報をご確認ください。" },
+  { id: "sapporo-snow-festival", name: "さっぽろ雪まつり", region: "北海道", months: [2], lat: 43.0618, lng: 141.3545, detail: "冬季開催の雪まつり。会場や開催期間は公式情報をご確認ください。" },
+  { id: "sendai-tanabata", name: "仙台七夕まつり", region: "宮城", months: [8], lat: 38.2601, lng: 140.8721, detail: "夏季開催の七夕まつり。開催日・会場情報をご確認ください。" },
+  { id: "nagoya-festival", name: "名古屋まつり", region: "愛知", months: [10], lat: 35.1709, lng: 136.8815, detail: "秋季開催の市民祭。行列・イベント内容は公式情報をご確認ください。" },
+  { id: "awa-odori", name: "阿波おどり", region: "徳島", months: [8], lat: 34.0703, lng: 134.5548, detail: "夏季開催の踊りイベント。日程・観覧席情報をご確認ください。" },
+  { id: "okinawa-eisa", name: "沖縄全島エイサーまつり", region: "沖縄", months: [8, 9], lat: 26.3344, lng: 127.8014, detail: "夏季開催の伝統芸能イベント。開催日程は公式発表をご確認ください。" }
+];

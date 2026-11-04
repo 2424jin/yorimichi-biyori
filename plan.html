@@ -1,0 +1,1310 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3f7fb">
+    <meta name="description" content="作成したお出かけプランの行程と時間を確認できます。">
+    <title>作成したプラン | よりみち日和</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+        color: #e7f2f6;
+        background: #07131e;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        --muted: #91aab6;
+        --cyan: #62e5d6;
+        --line: rgb(110 182 198 / 20%);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        background:
+          radial-gradient(ellipse at 18% 0, rgb(32 139 156 / 16%), transparent 36%),
+          radial-gradient(ellipse at 96% 52%, rgb(36 104 154 / 12%), transparent 34%),
+          linear-gradient(180deg, #07131e, #0a1a27 60%, #07131e);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a:focus-visible {
+        outline: 3px solid var(--cyan);
+        outline-offset: 3px;
+      }
+
+      .topbar,
+      main,
+      footer {
+        width: min(100% - 40px, 1040px);
+        margin-inline: auto;
+      }
+
+      .topbar {
+        display: flex;
+        min-height: 74px;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 35px;
+        height: 35px;
+        place-items: center;
+        border: 1px solid rgb(76 231 220 / 70%);
+        border-radius: 50%;
+        color: #68efe1;
+        font-family: Georgia, serif;
+        font-size: 1.1rem;
+        font-weight: 400;
+        box-shadow: 0 0 18px rgb(61 218 212 / 14%);
+      }
+
+      .topbar-note,
+      .eyebrow {
+        color: var(--muted);
+        font-size: 0.67rem;
+        font-weight: 750;
+        letter-spacing: 0.15em;
+      }
+
+      main {
+        padding-block: 62px 76px;
+      }
+
+      .page-navigation {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-bottom: 16px;
+      }
+
+      .navigation-link {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        padding: 9px 13px;
+        border: 1px solid rgb(116 190 201 / 32%);
+        border-radius: 9px;
+        color: #c9f5ef;
+        background: #122a37;
+        font-size: 0.75rem;
+        font-weight: 750;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(24px, 5vw, 48px);
+        border: 1px solid rgb(99 227 215 / 28%);
+        border-radius: 22px;
+        background:
+          linear-gradient(125deg, rgb(11 34 48 / 96%), rgb(13 64 74 / 84%)),
+          radial-gradient(ellipse at 90% 15%, rgb(76 230 215 / 25%), transparent 40%);
+        box-shadow: 0 24px 70px rgb(0 0 0 / 32%), inset 0 1px rgb(255 255 255 / 5%);
+      }
+
+      .hero::after {
+        position: absolute;
+        top: -90px;
+        right: -40px;
+        width: 300px;
+        height: 300px;
+        border: 1px solid rgb(108 241 221 / 20%);
+        border-radius: 50%;
+        box-shadow: 0 0 0 28px rgb(108 241 221 / 4%), 0 0 0 64px rgb(108 241 221 / 3%);
+        content: "";
+        pointer-events: none;
+      }
+
+      .success-chip {
+        display: inline-flex;
+        min-height: 31px;
+        align-items: center;
+        gap: 8px;
+        padding: 0 11px;
+        border: 1px solid rgb(108 241 221 / 30%);
+        border-radius: 30px;
+        color: #9af4e5;
+        background: rgb(21 105 99 / 24%);
+        font-size: 0.67rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+      }
+
+      .success-chip::before {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #64e7b5;
+        box-shadow: 0 0 12px #64e7b5;
+        content: "";
+      }
+
+      .eyebrow {
+        margin: 24px 0 9px;
+        color: #76e9de;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        letter-spacing: 0.03em;
+      }
+
+      .hero-copy {
+        max-width: 650px;
+        margin: 14px 0 0;
+        color: #b7cbd4;
+        font-size: 0.86rem;
+        line-height: 1.8;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .action {
+        display: inline-flex;
+        min-height: 43px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 15px;
+        border: 1px solid rgb(116 190 201 / 32%);
+        border-radius: 8px;
+        color: #c9f5ef;
+        background: #122a37;
+        font-size: 0.76rem;
+        font-weight: 750;
+      }
+
+      .action-primary {
+        border-color: #54d6ce;
+        color: #062128;
+        background: linear-gradient(115deg, #78f0dd, #57c9e2);
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin: 18px 0 28px;
+      }
+
+      .metric,
+      .itinerary {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: linear-gradient(145deg, rgb(19 39 52 / 96%), rgb(11 27 39 / 98%));
+        box-shadow: 0 14px 36px rgb(0 0 0 / 18%);
+      }
+
+      .metric {
+        min-height: 105px;
+        padding: 17px;
+      }
+
+      .metric-label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.67rem;
+      }
+
+      .metric-value {
+        display: block;
+        margin-top: 10px;
+        color: #c7fff2;
+        font-size: clamp(1rem, 2.5vw, 1.35rem);
+        font-weight: 800;
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 0 0 13px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 1.3rem;
+      }
+
+      .section-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.68rem;
+      }
+
+      .itinerary {
+        display: grid;
+        gap: 0;
+        padding: 22px;
+      }
+
+      .timeline-start,
+      .stop-card {
+        position: relative;
+        display: grid;
+        grid-template-columns: 58px minmax(0, 1fr);
+        gap: 14px;
+      }
+
+      .timeline-start {
+        padding-bottom: 16px;
+      }
+
+      .timeline-start::after,
+      .stop-card:not(:last-child)::after {
+        position: absolute;
+        top: 43px;
+        bottom: -1px;
+        left: 28px;
+        width: 1px;
+        background: linear-gradient(#43dcd4, rgb(67 220 212 / 10%));
+        content: "";
+      }
+
+      .time-badge {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        width: 58px;
+        min-height: 43px;
+        place-items: center;
+        border: 1px solid rgb(76 220 208 / 32%);
+        border-radius: 9px;
+        color: #a7f8e9;
+        background: #102a36;
+        font-size: 0.73rem;
+        font-weight: 800;
+      }
+
+      .node-copy {
+        align-self: center;
+        min-width: 0;
+      }
+
+      .node-kicker {
+        display: block;
+        margin-bottom: 3px;
+        color: #73e5da;
+        font-size: 0.61rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+      }
+
+      .node-copy strong {
+        display: block;
+        overflow-wrap: anywhere;
+        font-size: 0.91rem;
+      }
+
+      .node-copy small {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.68rem;
+        line-height: 1.6;
+      }
+
+      .travel-leg {
+        margin: 0 0 15px 72px;
+        padding: 11px 14px;
+        border-left: 2px solid #35c9c4;
+        border-radius: 0 9px 9px 0;
+        color: #afc8d1;
+        background: rgb(30 88 95 / 18%);
+        font-size: 0.72rem;
+        line-height: 1.75;
+      }
+
+      .travel-leg a,
+      .spot-link {
+        display: inline-block;
+        margin-top: 5px;
+        color: #7de8de;
+        font-weight: 750;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .stop-card {
+        padding: 0 0 18px;
+      }
+
+      .stop-card:last-child {
+        padding-bottom: 0;
+      }
+
+      .stop-panel {
+        min-width: 0;
+        padding: 16px;
+        border: 1px solid rgb(115 185 198 / 18%);
+        border-radius: 12px;
+        background: rgb(7 24 35 / 74%);
+      }
+
+      .meal-panel {
+        border-color: rgb(131 218 166 / 32%);
+        background: linear-gradient(145deg, rgb(20 64 58 / 76%), rgb(7 32 39 / 86%));
+      }
+
+      .stop-title {
+        margin: 0;
+        font-size: 0.98rem;
+      }
+
+      .stop-meta {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 0.68rem;
+      }
+
+      .stop-details {
+        display: grid;
+        gap: 5px;
+        margin: 12px 0 0;
+        color: #b5cbd3;
+        font-size: 0.72rem;
+        line-height: 1.6;
+      }
+
+      .disclaimer {
+        margin: 14px 2px 0;
+        color: var(--muted);
+        font-size: 0.68rem;
+        line-height: 1.75;
+      }
+
+      .empty-state {
+        display: none;
+        margin-top: 24px;
+        padding: 28px;
+        border: 1px solid rgb(255 154 118 / 32%);
+        border-radius: 14px;
+        color: #ffd2c3;
+        background: rgb(119 54 46 / 18%);
+        line-height: 1.8;
+      }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        padding-block: 22px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.67rem;
+      }
+
+      @media (max-width: 680px) {
+        .topbar,
+        main,
+        footer {
+          width: min(100% - 28px, 1040px);
+        }
+
+        .topbar {
+          min-height: 64px;
+        }
+
+        .topbar-note {
+          font-size: 0.56rem;
+        }
+
+        main {
+          padding-block: 34px 50px;
+        }
+
+        .summary-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .itinerary {
+          padding: 14px;
+        }
+
+        .timeline-start,
+        .stop-card {
+          grid-template-columns: 48px minmax(0, 1fr);
+          gap: 10px;
+        }
+
+        .time-badge {
+          width: 48px;
+        }
+
+        .timeline-start::after,
+        .stop-card:not(:last-child)::after {
+          left: 23px;
+        }
+
+        .travel-leg {
+          margin-left: 58px;
+        }
+
+        footer {
+          flex-direction: column;
+        }
+      }
+
+      :root {
+        color-scheme: light;
+        color: #17283a;
+        background: #f3f7fb;
+        --muted: #65768a;
+        --cyan: #147c91;
+        --line: #dce5ed;
+      }
+
+      @view-transition {
+        navigation: auto;
+      }
+
+      body {
+        background:
+          radial-gradient(ellipse at 10% 0, rgb(41 139 173 / 10%), transparent 34%),
+          linear-gradient(180deg, #f8fbfd, #eef4f8 58%, #f5f8fb);
+      }
+
+      .topbar,
+      main,
+      footer {
+        width: min(100% - 40px, 1180px);
+      }
+
+      .topbar {
+        border-color: #e0e8ef;
+      }
+
+      .brand {
+        color: #17364b;
+      }
+
+      .brand-mark {
+        color: #fff;
+        background: linear-gradient(145deg, #2485a0, #165676);
+        box-shadow: 0 5px 16px rgb(26 104 135 / 20%);
+      }
+
+      .topbar-note,
+      .eyebrow,
+      .section-note {
+        color: #6b8190;
+      }
+
+      .hero {
+        padding: clamp(24px, 4vw, 40px);
+        border: 1px solid #e0e9ef;
+        border-radius: 24px;
+        background: linear-gradient(135deg, #fff, #f7fbfd);
+        box-shadow: 0 14px 40px rgb(25 57 77 / 6%);
+      }
+
+      .success-chip {
+        border-color: #b6e3d7;
+        color: #16725f;
+        background: #eaf8f3;
+      }
+
+      .hero h1 {
+        color: #17364b;
+      }
+
+      .hero-copy {
+        color: #617587;
+      }
+
+      .action {
+        border-color: #d5e0e8;
+        color: #315267;
+        background: #fff;
+      }
+
+      .action-primary {
+        border-color: #176b84;
+        color: #fff;
+        background: linear-gradient(135deg, #2486a0, #17627c);
+        box-shadow: 0 8px 18px rgb(23 107 132 / 17%);
+      }
+
+      .overview-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(250px, 0.9fr);
+        gap: 16px;
+        margin: 20px 0 36px;
+        align-items: stretch;
+      }
+
+      .overview-card {
+        min-width: 0;
+        padding: 21px;
+        border: 1px solid #e0e8ef;
+        border-radius: 18px;
+        color: #24394b;
+        background: #fff;
+        box-shadow: 0 10px 28px rgb(25 57 77 / 5%);
+      }
+
+      .overview-card h2 {
+        margin: 0 0 16px;
+        color: #17364b;
+        font-size: 1rem;
+      }
+
+      .overview-kicker {
+        margin: 0 0 7px;
+        color: #19809a;
+        font-size: 0.65rem;
+        font-weight: 850;
+        letter-spacing: 0.12em;
+      }
+
+      .place-summary {
+        display: grid;
+        gap: 0;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .place-point {
+        position: relative;
+        display: grid;
+        grid-template-columns: 35px minmax(0, 1fr);
+        gap: 4px 10px;
+        padding: 0 0 15px;
+      }
+
+      .place-point:not(:last-child)::after {
+        position: absolute;
+        top: 31px;
+        bottom: 1px;
+        left: 16px;
+        width: 1px;
+        background: #c9dce6;
+        content: "";
+      }
+
+      .place-point-icon {
+        z-index: 1;
+        display: grid;
+        width: 33px;
+        height: 33px;
+        place-items: center;
+        border: 1px solid #cfe5ed;
+        border-radius: 50%;
+        color: #176d84;
+        background: #eff8fb;
+        font-size: 0.65rem;
+        font-weight: 850;
+      }
+
+      .place-point-copy {
+        align-self: center;
+        overflow-wrap: anywhere;
+        color: #20394c;
+        font-size: 0.82rem;
+        font-weight: 800;
+      }
+
+      .place-point-kind {
+        grid-column: 2;
+        color: #718394;
+        font-size: 0.67rem;
+      }
+
+      .time-summary {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .overview-metric {
+        min-width: 0;
+        padding: 12px;
+        border: 1px solid #e7edf2;
+        border-radius: 12px;
+        background: #f8fafc;
+      }
+
+      .overview-metric-label,
+      .overview-metric-value,
+      .overview-metric-detail {
+        display: block;
+      }
+
+      .overview-metric-label {
+        color: #738597;
+        font-size: 0.65rem;
+        font-weight: 750;
+      }
+
+      .overview-metric-value {
+        margin-top: 5px;
+        color: #1d4055;
+        font-size: 0.94rem;
+        overflow-wrap: anywhere;
+      }
+
+      .overview-metric-detail {
+        margin-top: 4px;
+        color: #708191;
+        font-size: 0.62rem;
+        line-height: 1.5;
+      }
+
+      .cost-summary {
+        display: grid;
+        gap: 10px;
+      }
+
+      .cost-total-label {
+        color: #6f8191;
+        font-size: 0.7rem;
+      }
+
+      .cost-total-value {
+        color: #145f78;
+        font-size: 1.75rem;
+        letter-spacing: -0.04em;
+      }
+
+      .cost-breakdown {
+        display: grid;
+        gap: 9px;
+        padding-top: 12px;
+        border-top: 1px solid #e4ebf0;
+      }
+
+      .cost-row,
+      .stop-cost-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: #617587;
+        font-size: 0.7rem;
+      }
+
+      .cost-row strong,
+      .stop-cost-row strong {
+        flex: 0 0 auto;
+        color: #26475b;
+      }
+
+      .budget-row {
+        padding-top: 9px;
+        border-top: 1px dashed #dbe5eb;
+      }
+
+      .over-budget strong {
+        color: #b24636;
+      }
+
+      .stop-cost-list {
+        display: grid;
+        gap: 8px;
+        margin: 2px 0 0;
+        padding: 10px 0 0;
+        border-top: 1px solid #e4ebf0;
+        list-style: none;
+      }
+
+      .stop-cost-row {
+        font-size: 0.64rem;
+      }
+
+      .section-heading h2 {
+        color: #17364b;
+      }
+
+      .itinerary {
+        border: 1px solid #e0e8ef;
+        background: #fff;
+        box-shadow: 0 12px 30px rgb(25 57 77 / 5%);
+      }
+
+      .timeline-start::after,
+      .stop-card:not(:last-child)::after {
+        background: #c7dce5;
+      }
+
+      .time-badge {
+        border-color: #cde5eb;
+        color: #176d84;
+        background: #edf8fa;
+      }
+
+      .node-copy strong,
+      .stop-title {
+        color: #20394c;
+      }
+
+      .node-copy small,
+      .stop-meta {
+        color: #6f8191;
+      }
+
+      .node-kicker {
+        color: #19809a;
+      }
+
+      .travel-leg {
+        border-color: #3b9eb1;
+        color: #526d7d;
+        background: #f0f8fa;
+      }
+
+      .travel-leg a,
+      .spot-link {
+        color: #14748d;
+      }
+
+      .stop-panel {
+        border-color: #e0e8ef;
+        background: #fff;
+      }
+
+      .meal-panel {
+        border-color: #c9e6d9;
+        background: #f2faf6;
+      }
+
+      .stop-details {
+        color: #5f7384;
+      }
+
+      .disclaimer,
+      footer {
+        color: #6d8190;
+      }
+
+      .empty-state {
+        border-color: #f0c7bb;
+        color: #794437;
+        background: #fff5f1;
+      }
+
+      footer {
+        border-color: #dfe7ed;
+      }
+
+      @media (max-width: 960px) {
+        .overview-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .cost-overview {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (max-width: 680px) {
+        .topbar,
+        main,
+        footer {
+          width: min(100% - 28px, 1180px);
+        }
+
+        .overview-grid {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 12px;
+        }
+
+        .cost-overview {
+          grid-column: auto;
+        }
+
+        .overview-card {
+          padding: 17px;
+        }
+      }
+
+      .itinerary {
+        gap: 5px;
+        padding: clamp(16px, 3vw, 28px);
+        background: linear-gradient(180deg, #fff, #fbfdff);
+      }
+
+      .timeline-start,
+      .stop-card {
+        grid-template-columns: 68px minmax(0, 1fr);
+        gap: 16px;
+      }
+
+      .timeline-start {
+        padding-bottom: 20px;
+      }
+
+      .timeline-start::after,
+      .stop-card:not(:last-child)::after {
+        left: 33px;
+        background: linear-gradient(#a7d6df, #dcecf0);
+      }
+
+      .time-badge {
+        width: 68px;
+        min-height: 46px;
+        border-radius: 12px;
+        color: #176d84;
+        background: #edf8fa;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .travel-leg {
+        display: grid;
+        gap: 3px;
+        margin: 0 0 20px 84px;
+        padding: 13px 16px;
+        border: 1px solid #dcebf0;
+        border-left: 4px solid #3b9eb1;
+        border-radius: 12px;
+        color: #526d7d;
+        background: #f5fafc;
+        line-height: 1.65;
+      }
+
+      .travel-times {
+        color: #205b6b;
+        font-size: 0.79rem;
+        font-variant-numeric: tabular-nums;
+        font-weight: 800;
+      }
+
+      .travel-info {
+        color: #607989;
+        font-size: 0.7rem;
+      }
+
+      .travel-leg a,
+      .spot-link {
+        width: fit-content;
+        margin-top: 3px;
+        color: #14748d;
+      }
+
+      .stop-card {
+        padding-bottom: 20px;
+      }
+
+      .stop-panel {
+        padding: clamp(15px, 2.4vw, 20px);
+        border-radius: 15px;
+        box-shadow: 0 8px 22px rgb(25 57 77 / 4%);
+      }
+
+      .stop-title {
+        line-height: 1.45;
+      }
+
+      .stop-details {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .detail-chip {
+        padding: 9px 11px;
+        border: 1px solid #e1ebf0;
+        border-radius: 10px;
+        color: #435d6f;
+        background: #f7fafc;
+        font-size: 0.69rem;
+        line-height: 1.55;
+      }
+
+      .detail-note {
+        grid-column: 1 / -1;
+        color: #617789;
+        line-height: 1.75;
+      }
+
+      .meal-panel .detail-chip {
+        border-color: #d6eae0;
+        background: #f8fcf9;
+      }
+
+      @media (max-width: 680px) {
+        .itinerary {
+          gap: 2px;
+          padding: 14px;
+        }
+
+        .timeline-start,
+        .stop-card {
+          grid-template-columns: 52px minmax(0, 1fr);
+          gap: 10px;
+        }
+
+        .time-badge {
+          width: 52px;
+          min-height: 42px;
+          font-size: 0.68rem;
+        }
+
+        .timeline-start::after,
+        .stop-card:not(:last-child)::after {
+          left: 25px;
+        }
+
+        .travel-leg {
+          margin-left: 62px;
+          padding: 11px 12px;
+        }
+
+        .stop-details {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .detail-note {
+          grid-column: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="index.html#top">
+        <span class="brand-mark" aria-hidden="true">Y</span>
+        <span>YORIMICHI BIYORI</span>
+      </a>
+      <span class="topbar-note">JAPAN DAY TRIP · ITINERARY</span>
+    </header>
+
+    <main>
+      <nav class="page-navigation" aria-label="ページ移動">
+        <a class="navigation-link" id="back-link" href="index.html#planner">← ひとつ戻る</a>
+        <a class="navigation-link" href="index.html#top">⌂ 最初の画面へ</a>
+        <a class="navigation-link" href="route.html">経路検索</a>
+        <a class="navigation-link" href="places.html">お店・施設</a>
+        <a class="navigation-link" href="events.html">イベント一覧</a>
+      </nav>
+      <section class="hero" aria-labelledby="page-title">
+        <span class="success-chip" id="success-chip">PLAN GENERATED</span>
+        <p class="eyebrow">YOUR ROUTE IS READY</p>
+        <h1 id="page-title">お出かけプランができました</h1>
+        <p class="hero-copy" id="hero-copy">選んだ開始時刻と終了時刻に合わせて、立ち寄り先と食事休憩を含む行程をまとめました。</p>
+        <div class="actions">
+          <a class="action action-primary" href="index.html#planner">プランを作り直す</a>
+          <a class="action" href="index.html#planner">地図で候補を見直す</a>
+        </div>
+      </section>
+
+      <section class="overview-grid" id="overview-grid" aria-label="プラン概要">
+        <section class="overview-card place-overview" aria-labelledby="place-summary-title">
+          <p class="overview-kicker">01 · 場所</p>
+          <h2 id="place-summary-title">立ち寄り先</h2>
+          <ol class="place-summary" id="place-summary"></ol>
+        </section>
+        <section class="overview-card time-overview" aria-labelledby="time-summary-title">
+          <p class="overview-kicker">02 · 時間</p>
+          <h2 id="time-summary-title">時間の使い方</h2>
+          <div class="time-summary" id="time-summary"></div>
+        </section>
+        <section class="overview-card cost-overview" aria-labelledby="cost-summary-title">
+          <p class="overview-kicker">03 · 費用</p>
+          <h2 id="cost-summary-title">費用の目安</h2>
+          <div class="cost-summary" id="cost-summary"></div>
+        </section>
+      </section>
+
+      <section aria-labelledby="itinerary-title">
+        <div class="section-heading">
+          <h2 id="itinerary-title">タイムライン</h2>
+          <p class="section-note" id="created-at"></p>
+        </div>
+        <div class="itinerary" id="itinerary"></div>
+        <p class="disclaimer">
+          時刻・移動時間・費用は計画用の概算です。実際の公共交通の発車時刻・乗換・運行状況、高速料金、施設の営業時間と入場料は各リンク先でご確認ください。
+        </p>
+      </section>
+
+      <section class="empty-state" id="empty-state" role="alert">
+        このページにプランデータがありません。プラン作成画面に戻り、出発地を設定してから作成してください。
+      </section>
+    </main>
+
+    <footer>
+      <span>© YORIMICHI BIYORI</span>
+      <span>移動時間・費用は計画用の目安です</span>
+    </footer>
+
+    <script>
+      (() => {
+        const overviewGrid = document.getElementById("overview-grid");
+        const placeSummary = document.getElementById("place-summary");
+        const timeSummary = document.getElementById("time-summary");
+        const costSummary = document.getElementById("cost-summary");
+        const itinerary = document.getElementById("itinerary");
+        const emptyState = document.getElementById("empty-state");
+        const modeLabels = {
+          transit: "電車・公共交通",
+          driving: "車",
+          walking: "徒歩",
+          bicycling: "自転車"
+        };
+
+        const formatMinutes = (minutes) => {
+          const hours = Math.floor(minutes / 60);
+          const remainder = minutes % 60;
+          if (!hours) return `${remainder}分`;
+          return remainder ? `${hours}時間${remainder}分` : `${hours}時間`;
+        };
+        const formatClock = (totalMinutes) => {
+          const dayOffset = Math.floor(totalMinutes / 1440);
+          const minutesInDay = ((totalMinutes % 1440) + 1440) % 1440;
+          const hours = String(Math.floor(minutesInDay / 60)).padStart(2, "0");
+          const minutes = String(minutesInDay % 60).padStart(2, "0");
+          return `${dayOffset ? "翌日 " : ""}${hours}:${minutes}`;
+        };
+        const formatYen = (yen) => `約${Math.round(yen).toLocaleString("ja-JP")}円`;
+        const node = (tag, className, text) => {
+          const element = document.createElement(tag);
+          if (className) element.className = className;
+          if (text !== undefined) element.textContent = text;
+          return element;
+        };
+        const mapDirectionsUrl = (origin, destination, mode) => {
+          const params = new URLSearchParams({ api: "1", origin, destination, travelmode: mode });
+          return `https://www.google.com/maps/dir/?${params.toString()}`;
+        };
+        const mapSearchUrl = (name, lat, lng) => {
+          const query = Number.isFinite(lat) && Number.isFinite(lng) ? `${lat},${lng}` : name;
+          return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        };
+        const isPlanValid = (plan) =>
+          plan &&
+          plan.version === 1 &&
+          plan.origin &&
+          typeof plan.origin.name === "string" &&
+          Number.isFinite(plan.startMinute) &&
+          Number.isFinite(plan.endMinute) &&
+          Number.isFinite(plan.availableMinutes) &&
+          Number.isFinite(plan.elapsedMinutes) &&
+          Number.isFinite(plan.estimateYen) &&
+          Array.isArray(plan.stops) &&
+          plan.stops.length > 0 &&
+          plan.stops.every((stop) =>
+            stop &&
+            typeof stop.name === "string" &&
+            Number.isFinite(stop.arrivalMinute) &&
+            Number.isFinite(stop.queueEndMinute) &&
+            Number.isFinite(stop.visitEndMinute)
+          );
+
+        const renderMetric = (container, label, value, detail) => {
+          const metric = node("div", "overview-metric");
+          metric.append(node("span", "overview-metric-label", label), node("strong", "overview-metric-value", value));
+          if (detail) metric.append(node("small", "overview-metric-detail", detail));
+          container.append(metric);
+        };
+
+        const renderPlan = (plan) => {
+          document.getElementById("hero-copy").textContent =
+            `${plan.origin.name}を出発し、希望時間 ${formatClock(plan.startMinute)}〜${formatClock(plan.endMinute)}の中で回れる行程を作成しました。`;
+          const modeLabel = modeLabels[plan.travelMode] || modeLabels.transit;
+          const originPoint = node("li", "place-point");
+          originPoint.append(
+            node("span", "place-point-icon", "S"),
+            node("span", "place-point-copy", plan.origin.name),
+            node("span", "place-point-kind", "出発地")
+          );
+          placeSummary.append(originPoint);
+          plan.stops.forEach((stop, index) => {
+            const point = node("li", "place-point");
+            point.append(
+              node("span", "place-point-icon", String(index + 1).padStart(2, "0")),
+              node("span", "place-point-copy", stop.name),
+              node("span", "place-point-kind", stop.area || "立ち寄り先")
+            );
+            placeSummary.append(point);
+          });
+          renderMetric(timeSummary, "予定時間", `${formatClock(plan.startMinute)}〜${formatClock(plan.endMinute)}`, `希望枠 約${formatMinutes(plan.availableMinutes)}`);
+          renderMetric(timeSummary, "行程時間", formatMinutes(plan.elapsedMinutes), `${plan.stops.length}か所を巡るプラン`);
+          renderMetric(timeSummary, "移動", formatMinutes(plan.travelTotal), modeLabel);
+          renderMetric(timeSummary, "待ち時間", formatMinutes(plan.waitTotal), "乗換・施設の待ち時間");
+          renderMetric(timeSummary, "滞在", formatMinutes(plan.stayTotal), "各スポットで過ごす時間");
+          renderMetric(
+            timeSummary,
+            "食事休憩",
+            plan.meal ? formatMinutes(plan.meal.durationMinutes) : "なし",
+            plan.meal ? `${formatClock(plan.meal.startMinute)}〜${formatClock(plan.meal.endMinute)}` : "行程に含まれていません"
+          );
+
+          const mealCost = plan.meal && Number.isFinite(plan.meal.costYen) ? plan.meal.costYen : 0;
+          costSummary.append(
+            node("div", "cost-total-label", "1人あたりの合計目安"),
+            node("strong", "cost-total-value", formatYen(plan.estimateYen))
+          );
+          const costBreakdown = node("div", "cost-breakdown");
+          const appendCostRow = (label, amount, className = "") => {
+            const row = node("div", `cost-row${className ? ` ${className}` : ""}`);
+            row.append(node("span", "", label), node("strong", "", amount));
+            costBreakdown.append(row);
+          };
+          if (Number.isFinite(plan.transportCostYen) && Number.isFinite(plan.admissionCostYen)) {
+            appendCostRow("交通費（距離・移動手段から算出）", formatYen(plan.transportCostYen));
+            appendCostRow("入場料・施設利用料の目安", formatYen(plan.admissionCostYen));
+          } else {
+            const visitAndTravelCost = Math.max(0, plan.estimateYen - mealCost);
+            appendCostRow("スポット・移動費の目安", formatYen(visitAndTravelCost));
+          }
+          appendCostRow("食事", plan.meal ? formatYen(mealCost) : "なし");
+          if (plan.budget !== null && Number.isFinite(plan.budget)) {
+            const remaining = plan.budget - plan.estimateYen;
+            appendCostRow(
+              `予算 ${formatYen(plan.budget)} · ${remaining < 0 ? "超過" : "残り"}`,
+              formatYen(Math.abs(remaining)),
+              `budget-row${remaining < 0 ? "over-budget" : ""}`
+            );
+          }
+          const stopCostList = node("ul", "stop-cost-list");
+          plan.stops.forEach((stop, index) => {
+            if (!Number.isFinite(stop.stopCost)) return;
+            const item = node("li", "stop-cost-row");
+            const costDetail =
+              Number.isFinite(stop.transportCostYen) && Number.isFinite(stop.admissionCostYen)
+                ? `移動 ${formatYen(stop.transportCostYen)} · 入場等 ${formatYen(stop.admissionCostYen)}`
+                : formatYen(stop.stopCost);
+            item.append(
+              node("span", "", `${String(index + 1).padStart(2, "0")} · ${stop.name}`),
+              node("strong", "", costDetail)
+            );
+            stopCostList.append(item);
+          });
+          if (stopCostList.childElementCount) costBreakdown.append(stopCostList);
+          costSummary.append(costBreakdown);
+
+          const generatedAt = new Date(plan.createdAt);
+          document.getElementById("created-at").textContent =
+            Number.isNaN(generatedAt.getTime()) ? "" : `作成 ${generatedAt.toLocaleString("ja-JP")}`;
+
+          const start = node("div", "timeline-start");
+          const startTime = node("span", "time-badge", plan.startTime || formatClock(plan.startMinute));
+          const startCopy = node("div", "node-copy");
+          startCopy.append(
+            node("span", "node-kicker", "START"),
+            node("strong", "", plan.origin.name),
+            node("small", "", `希望終了 ${formatClock(plan.endMinute)} · 移動手段 ${modeLabel}`)
+          );
+          start.append(startTime, startCopy);
+          itinerary.append(start);
+
+          plan.stops.forEach((stop, index) => {
+            const previousStop = index > 0 ? plan.stops[index - 1] : null;
+            const departureMinute = previousStop
+              ? plan.meal && plan.meal.afterStopIndex === index - 1
+                ? plan.meal.endMinute
+                : previousStop.visitEndMinute
+              : plan.startMinute;
+            const leg = node("div", "travel-leg");
+            const preparationLabel = plan.travelMode === "transit"
+              ? (index === 0 ? "乗車準備" : "乗換待ち")
+              : plan.travelMode === "driving" ? "出発準備" : "";
+            const preparationDetail = stop.transferWait > 0 && preparationLabel
+              ? ` · ${preparationLabel} 約${formatMinutes(stop.transferWait)}`
+              : "";
+            leg.append(
+              node("strong", "travel-times", `${formatClock(departureMinute)} 出発 → ${formatClock(stop.arrivalMinute)} 到着目安`),
+              node("span", "travel-info", `移動 約${formatMinutes(stop.travelMinutes)}（約${Number(stop.legDistance).toFixed(1)} km）${preparationDetail}`)
+            );
+            const directions = node("a", "", `${modeLabel}の経路・時刻を確認 ↗`);
+            directions.href = mapDirectionsUrl(stop.from || plan.origin.name, stop.name, plan.travelMode || "transit");
+            leg.append(directions);
+            itinerary.append(leg);
+
+            const card = node("div", "stop-card");
+            const arrival = node("span", "time-badge", formatClock(stop.arrivalMinute));
+            const panel = node("div", "stop-panel");
+            panel.append(
+              node("span", "node-kicker", `STOP ${String(index + 1).padStart(2, "0")}`),
+              node("h3", "stop-title", `${stop.emoji || "📍"} ${stop.name}`),
+              node("p", "stop-meta", stop.area || "おすすめスポット")
+            );
+            const details = node("div", "stop-details");
+            details.append(
+              node("span", "detail-chip", `到着 ${formatClock(stop.arrivalMinute)} · 入場/行列待ち 約${formatMinutes(stop.waitMinutes)}`),
+              node("span", "detail-chip", `滞在 約${formatMinutes(stop.stayMinutes)} · ${formatClock(stop.queueEndMinute)}〜${formatClock(stop.visitEndMinute)}`)
+            );
+            if (stop.description) details.append(node("span", "detail-note", stop.description));
+            const spotLink = node("a", "spot-link", "地図で場所を確認 ↗");
+            spotLink.href = mapSearchUrl(stop.name, stop.lat, stop.lng);
+            details.append(spotLink);
+            panel.append(details);
+            card.append(arrival, panel);
+            itinerary.append(card);
+
+            if (plan.meal && plan.meal.afterStopIndex === index) {
+              const mealCard = node("div", "stop-card meal-card");
+              const mealTime = node("span", "time-badge", formatClock(plan.meal.startMinute));
+              const mealPanel = node("div", "stop-panel meal-panel");
+              mealPanel.append(
+                node("span", "node-kicker", "MEAL BREAK"),
+                node("h3", "stop-title", `🍽️ ${plan.meal.label}`),
+                node("p", "stop-meta", `${plan.meal.nearbyName || stop.name} 周辺で食事休憩`)
+              );
+              const mealDetails = node("div", "stop-details");
+              mealDetails.append(node("span", "detail-chip", `${formatClock(plan.meal.startMinute)}〜${formatClock(plan.meal.endMinute)} · 食事休憩 約${formatMinutes(plan.meal.durationMinutes)}`));
+              const restaurantsLink = node("a", "spot-link", "Google マップで近くの飲食店を探す ↗");
+              restaurantsLink.href = mapSearchUrl(plan.meal.searchQuery || `${plan.meal.label} レストラン ${stop.name}`);
+              mealDetails.append(restaurantsLink);
+              mealPanel.append(mealDetails);
+              mealCard.append(mealTime, mealPanel);
+              itinerary.append(mealCard);
+            }
+          });
+          const totals = node(
+            "p",
+            "disclaimer",
+            `合計：移動 約${formatMinutes(plan.travelTotal)} · 乗換・行列待ち 約${formatMinutes(plan.waitTotal)} · 滞在 約${formatMinutes(plan.stayTotal)}${plan.meal ? ` · 食事休憩 約${formatMinutes(plan.meal.durationMinutes)}` : ""}`
+          );
+          itinerary.append(totals);
+        };
+
+        try {
+          const encoded = window.location.hash.slice(1);
+          const plan = encoded ? JSON.parse(decodeURIComponent(encoded)) : null;
+          if (!isPlanValid(plan)) throw new Error("Missing or invalid itinerary data");
+          renderPlan(plan);
+        } catch (error) {
+          document.getElementById("success-chip").textContent = "NO PLAN DATA";
+          document.getElementById("page-title").textContent = "プランを読み込めません";
+          document.getElementById("hero-copy").textContent =
+            "プラン作成画面から出発地を設定し、時間内に回れる候補を選んで作成してください。";
+          overviewGrid.hidden = true;
+          itinerary.hidden = true;
+          document.getElementById("created-at").hidden = true;
+          emptyState.style.display = "block";
+        }
+      })();
+    </script>
+  </body>
+</html>
