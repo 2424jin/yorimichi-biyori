@@ -194,6 +194,26 @@
       .summary span { display: block; font-size: 12px; font-weight: 700; color: var(--brown); }
       .summary strong { font-size: 18px; }
 
+      /* くわしく欄 */
+      .info-dialog { width: min(560px, calc(100% - 24px)); max-height: calc(100vh - 48px); padding: 0; border: 2px solid var(--navy); border-radius: 22px; background: var(--card); color: var(--ink); box-shadow: 8px 8px 0 var(--navy); }
+      .info-dialog::backdrop { background: rgb(31 42 55 / 45%); }
+      .info-inner { display: flex; flex-direction: column; gap: 14px; padding: 24px; }
+      .info-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+      .info-head h2 { margin: 0; font-size: 26px; color: var(--navy); }
+      .info-kind { margin: 0; font-size: 13px; font-weight: 700; color: var(--accent); }
+      .info-close { flex: none; min-width: 44px; min-height: 44px; border: 0; border-radius: 12px; background: var(--paper); font-size: 20px; font-weight: 700; }
+      .info-table { display: grid; grid-template-columns: 7em minmax(0, 1fr); gap: 8px 12px; margin: 0; font-size: 14px; }
+      .info-table dt { font-weight: 700; color: var(--brown); }
+      .info-table dd { margin: 0; }
+      .info-pending { padding: 12px; border-radius: 12px; border: 2px dashed var(--line); color: var(--brown); font-size: 14px; }
+      .info-list { margin: 0; padding-left: 20px; }
+      .info-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      .link-btn { padding: 0; border: 0; background: none; color: inherit; font-weight: 700; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+      .foods { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; border: 2px solid var(--line); }
+      .foods h3 { margin: 0; font-size: 16px; }
+      .food-chip { min-height: 40px; padding: 0 12px; border-radius: 999px; border: 2px solid var(--meal); background: var(--card); color: #7a4708; font-weight: 700; font-size: 14px; }
+      .food-chip[aria-pressed="true"] { background: var(--meal); color: #fff; }
+
       @media (max-width: 1100px) {
         .pick-body { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); height: auto; }
         .col-book { grid-column: 1 / -1; border-left: 0; border-top: 2px dashed var(--line); overflow: visible; }
@@ -311,6 +331,11 @@
             <span class="book-count" id="book-count">0か所</span>
           </div>
           <div id="book-days"></div>
+          <section class="foods" aria-labelledby="foods-title">
+            <h3 id="foods-title">食べたい名物</h3>
+            <p class="note" id="foods-note">選ぶと、プランのごはん休憩に入ります。</p>
+            <div class="chips" id="food-chips" role="group" aria-labelledby="foods-title"></div>
+          </section>
           <p class="note">日の分け方と順番は、場所の近さからサイトが決めます。</p>
           <button class="btn-main book-cta" type="button" id="to-plan" disabled>時間つきのプランにする →</button>
         </aside>
@@ -351,10 +376,28 @@
       </div>
     </section>
 
-    <script src="spots-curated.js"></script>
-    <script src="wikidata-spots.js"></script>
-    <script src="spots-added.js"></script>
-    <script src="events.js"></script>
+    <dialog class="info-dialog" id="info-dialog" aria-labelledby="info-name">
+      <div class="info-inner">
+        <div class="info-head">
+          <div>
+            <p class="info-kind" id="info-kind"></p>
+            <h2 class="round" id="info-name"></h2>
+          </div>
+          <button class="info-close" type="button" id="info-close" aria-label="閉じる">×</button>
+        </div>
+        <div id="info-body"></div>
+        <div class="info-actions">
+          <button class="btn-main btn-accent" type="button" id="info-toggle" style="flex: 1 1 220px;">＋ しおりに入れる</button>
+          <a class="btn" id="info-map" href="#" target="_blank" rel="noopener noreferrer">地図で見る ↗</a>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="spots-curated.js?v=20261112"></script>
+    <script src="wikidata-spots.js?v=20261112"></script>
+    <script src="spots-added.js?v=20261112"></script>
+    <script src="events.js?v=20261112"></script>
+    <script src="kyoto-info.js?v=20261112"></script>
     <script>
       (() => {
         "use strict";
@@ -365,12 +408,14 @@
           { key: "temple", label: "神社・お寺" },
           { key: "nature", label: "自然・景色" },
           { key: "museum", label: "博物館・体験" },
-          { key: "town", label: "街・名所" }
+          { key: "town", label: "街・名所" },
+          { key: "food", label: "食べる" }
         ];
         const groupLabel = (key) => (GROUPS.find((g) => g.key === key) || GROUPS[4]).label;
         const groupOf = (spot) => {
           if (spot.group) return spot.group;
           const name = spot.name;
+          if (/市場|商店街|横丁|食べ歩き/.test(name)) return "food";
           if (spot.spotKind === "shrine" || /寺|院|神社|神宮|大社|天満宮|八幡宮|稲荷|社$/.test(name)) return "temple";
           if (spot.spotKind === "facility" || /博物館|美術館|ミュージアム|水族館|動物園|科学館|資料館|記念館|劇場|体験/.test(name)) return "museum";
           if (spot.category === "nature" || /公園|庭園|山|滝|川|湖|海|島|岬|峡|渓|高原|浜|橋|森|竹林|花/.test(name)) return "nature";
@@ -381,7 +426,7 @@
           const g = groupOf(spot);
           if (/テーマパーク|遊園地|ディズニー|ユニバーサル|サファリ/.test(name)) return { stay: 240, cost: 8000 };
           if (/水族館|動物園|博物館|美術館|ミュージアム|科学館/.test(name)) return { stay: 120, cost: 1500 };
-          if (/市場|商店街|通り|横丁/.test(name)) return { stay: 60, cost: 1000 };
+          if (g === "food" || /市場|商店街|通り|横丁/.test(name)) return { stay: 60, cost: 1000 };
           if (g === "temple") return { stay: 60, cost: 500 };
           if (g === "nature") return { stay: 60, cost: 0 };
           if (g === "museum") return { stay: 90, cost: 1200 };
@@ -433,7 +478,11 @@
         const KEY = "yorimichi-trip-v2";
         const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || null; } catch (e) { return null; } };
         const save = () => { try { localStorage.setItem(KEY, JSON.stringify(trip)); } catch (e) { /* 保存できなくても動く */ } };
-        let trip = Object.assign({ town: null, arrive: null, days: 2, start: "09:00", end: "18:00", picks: [] }, load() || {});
+        let trip = Object.assign({ town: null, arrive: null, days: 2, start: "09:00", end: "18:00", picks: [], foods: [] }, load() || {});
+        const FOODS = window.yorimichiFoods || [];
+        const FOOD_BY_ID = new Map(FOODS.map((f) => [f.id, f]));
+        trip.foods = (trip.foods || []).filter((id) => FOOD_BY_ID.has(id));
+        const INFO = window.yorimichiSpotInfo || {};
         trip.picks = (trip.picks || []).filter((id) => BY_ID.has(id));
 
         // ===== 場所さがし（Photon） =====
@@ -641,11 +690,10 @@
           const t = e.target.closest("[data-toggle]");
           if (t) { togglePick(t.dataset.toggle); return; }
           const f = e.target.closest("[data-focus]");
-          if (f && pickMap) {
+          if (f) {
             const s = BY_ID.get(f.dataset.focus);
-            pickMap.setView([s.lat, s.lng], Math.max(pickMap.getZoom(), 15));
-            const m = markerById.get(s.id);
-            if (m) m.openPopup();
+            if (pickMap) pickMap.setView([s.lat, s.lng], Math.max(pickMap.getZoom(), 15));
+            openInfo(s.id);
           }
         });
 
@@ -675,6 +723,62 @@
         });
         toPlanBtn.addEventListener("click", () => go("plan"));
 
+        const foodChips = document.getElementById("food-chips");
+        const renderFoods = () => {
+          document.getElementById("foods-note").textContent = FOODS.length
+            ? "選ぶと、プランのごはん休憩に入ります。"
+            : "名物のリストは準備中です（調べ物のあとで足します）。";
+          foodChips.innerHTML = FOODS.map((f) => `<button class="food-chip" type="button" data-food="${esc(f.id)}" aria-pressed="${trip.foods.includes(f.id)}" title="${esc(f.desc || "")}">${esc(f.name)}</button>`).join("");
+        };
+        foodChips.addEventListener("click", (e) => {
+          const b = e.target.closest("[data-food]");
+          if (!b) return;
+          const id = b.dataset.food;
+          const i = trip.foods.indexOf(id);
+          if (i >= 0) trip.foods.splice(i, 1); else trip.foods.push(id);
+          save();
+          renderFoods();
+        });
+
+        // ===== くわしく欄 =====
+        const dlg = document.getElementById("info-dialog");
+        let infoId = null;
+        const row = (k, v) => (v ? `<dt>${k}</dt><dd>${v}</dd>` : "");
+        const openInfo = (id) => {
+          const s = BY_ID.get(id);
+          if (!s) return;
+          infoId = id;
+          const info = INFO[s.name] || INFO[s.name.replace(/（.*$/, "")] || null;
+          document.getElementById("info-kind").textContent = groupLabel(s.group);
+          document.getElementById("info-name").textContent = s.name;
+          let html = "";
+          if (info) {
+            if (info.summary) html += `<p style="margin: 0 0 12px;">${esc(info.summary)}</p>`;
+            if (info.highlights && info.highlights.length) html += `<p style="margin: 0; font-weight: 700;">見どころ</p><ul class="info-list">${info.highlights.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>`;
+          } else {
+            html += `<p class="info-pending">くわしい説明・見どころは準備中です（調べ物のあとで足します）。</p>`;
+          }
+          html += `<dl class="info-table" style="margin-top: 12px;">`;
+          html += row("拝観・営業", info && info.hours ? esc(info.hours) : "未確認");
+          html += row("料金（大人）", info && info.fee ? esc(info.fee) : "未確認");
+          html += row("見る時間", `目安 ${dur(s.stay)}`);
+          if (info && info.official) html += row("公式サイト", `<a href="${esc(info.official)}" target="_blank" rel="noopener noreferrer">公式サイトを開く ↗</a>`);
+          if (info && info.sources && info.sources.length) html += row("出どころ", info.sources.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${i + 1}</a>`).join("・") + (info.checked ? `（${esc(info.checked)}に確認）` : ""));
+          html += `</dl>`;
+          html += `<p class="note" style="margin-top: 10px;">時間や料金は変わることがあります。行く前に公式の情報で確かめてください。</p>`;
+          document.getElementById("info-body").innerHTML = html;
+          const on = trip.picks.includes(id);
+          const tg = document.getElementById("info-toggle");
+          tg.textContent = on ? "しおりから外す" : "＋ しおりに入れる";
+          tg.hidden = !screens.pick.hidden ? false : true;
+          document.getElementById("info-map").href = gmapsSearch(s.name, s);
+          if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+        };
+        const closeInfo = () => { if (typeof dlg.close === "function") dlg.close(); else dlg.removeAttribute("open"); };
+        document.getElementById("info-close").addEventListener("click", closeInfo);
+        dlg.addEventListener("click", (e) => { if (e.target === dlg) closeInfo(); });
+        document.getElementById("info-toggle").addEventListener("click", () => { if (infoId) togglePick(infoId); closeInfo(); });
+
         const markerById = new Map();
         const drawPickMarkers = () => {
           if (!pickMap || !pickLayer) return;
@@ -691,8 +795,9 @@
               : L.circleMarker([s.lat, s.lng], { radius: 7, color: "#1f3a5f", weight: 3, fillColor: "#fffdf8", fillOpacity: 1 });
             const box = document.createElement("div");
             box.className = "pin-popup";
-            box.innerHTML = `<strong>${esc(s.name)}</strong><span>${groupLabel(s.group)} · 滞在の目安 ${dur(s.stay)}</span><button type="button">${on ? "しおりから外す" : "＋ しおりに入れる"}</button>`;
-            box.querySelector("button").addEventListener("click", () => { pickMap.closePopup(); togglePick(id); });
+            box.innerHTML = `<strong>${esc(s.name)}</strong><span>${groupLabel(s.group)} · 滞在の目安 ${dur(s.stay)}</span><button type="button" data-act="toggle">${on ? "しおりから外す" : "＋ しおりに入れる"}</button><button type="button" data-act="info" style="background: var(--card); color: var(--navy); border: 2px solid var(--navy);">くわしく見る</button>`;
+            box.querySelector('[data-act="toggle"]').addEventListener("click", () => { pickMap.closePopup(); togglePick(id); });
+            box.querySelector('[data-act="info"]').addEventListener("click", () => { pickMap.closePopup(); openInfo(id); });
             marker.bindPopup(box);
             marker.addTo(pickLayer);
             markerById.set(id, marker);
@@ -718,6 +823,7 @@
           }
           renderList();
           renderBook();
+          renderFoods();
           loadMapLibs().then(() => {
             if (!pickMap) {
               pickMap = makeMap("map", document.getElementById("map-msg"));
@@ -776,6 +882,7 @@
           // 3. 日ごとに、近い順に回り、時刻をつける
           let from = base;
           let totalYen = 0;
+          const foodQueue = trip.foods.map((id) => FOOD_BY_ID.get(id)).filter(Boolean);
           const days = groups.map((mem, d) => {
             const stops = [];
             const left = mem.slice();
@@ -818,7 +925,7 @@
               items.push({ type: "stop", stop: st });
               here = s;
               if (!lunchDone && t >= 11 * 60 + 30 && t <= 14 * 60 + 30) {
-                items.push({ type: "meal", at: t, place: s });
+                items.push({ type: "meal", at: t, place: s, food: foodQueue.shift() || null });
                 t += 60;
                 totalYen += 1200;
                 lunchDone = true;
@@ -837,7 +944,7 @@
             from = here;
             return { stops, items, endAt: t, free: Math.max(0, endMin - t), overMinutes: Math.max(0, t - endMin) };
           });
-          return { days, totalYen };
+          return { days, totalYen, foodsLeft: foodQueue };
         };
 
         // ===== ③ プラン =====
@@ -861,10 +968,13 @@
               if (it.type === "stop") {
                 num += 1;
                 const st = it.stop;
-                return `<li class="tl"><span class="tl-time">${clock(st.arriveAt)}</span><span class="tl-mark" style="background:${COLORS[d % 3]}">${num}</span><span class="tl-body"><strong>${esc(st.spot.name)}</strong><span class="sub">${groupLabel(st.spot.group)} · 滞在の目安 ${dur(st.spot.stay)}（〜${clock(st.leaveAt)}）</span></span></li>`;
+                return `<li class="tl"><span class="tl-time">${clock(st.arriveAt)}</span><span class="tl-mark" style="background:${COLORS[d % 3]}">${num}</span><span class="tl-body"><button type="button" class="link-btn round" data-info="${esc(st.spot.id)}" style="font-size: 17px;">${esc(st.spot.name)}</button><span class="sub">${groupLabel(st.spot.group)} · 滞在の目安 ${dur(st.spot.stay)}（〜${clock(st.leaveAt)}）</span></span></li>`;
               }
               if (it.type === "meal") {
-                return `<li class="tl"><span class="tl-time">${clock(it.at)}</span><span class="tl-mark meal">食</span><span class="tl-body"><strong>ごはん休憩（約1時間）</strong><a class="sub" href="${gmapsSearch("ランチ", it.place)}" target="_blank" rel="noopener noreferrer">${esc(it.place.name)}の近くのお店をさがす ↗</a></span></li>`;
+                const food = it.food;
+                const title = food ? `ごはん休憩：${esc(food.name)}を食べる（約1時間）` : "ごはん休憩（約1時間）";
+                const q = food ? food.name : "ランチ";
+                return `<li class="tl"><span class="tl-time">${clock(it.at)}</span><span class="tl-mark meal">食</span><span class="tl-body"><strong>${title}</strong><a class="sub" href="${gmapsSearch(q, it.place)}" target="_blank" rel="noopener noreferrer">${esc(it.place.name)}の近くで${food ? esc(food.name) + "のお店" : "お店"}をさがす ↗</a></span></li>`;
               }
               if (it.type === "hotel") {
                 return `<li class="tl"><span class="tl-time">夜</span><span class="tl-mark hotel">宿</span><span class="tl-body"><strong>${esc(it.label)}</strong><a class="sub" href="${gmapsSearch("ホテル", it.place)}" target="_blank" rel="noopener noreferrer">エリアの目安です。近くの宿をさがす ↗</a></span></li>`;
@@ -879,7 +989,8 @@
           document.getElementById("summary").innerHTML = `
             <div><span>費用の目安（1人・宿代は入れない）</span><strong>${yen(plan.totalYen)}</strong></div>
             <div><span>${esc(trip.town.name)}の今の天気</span><strong id="weather">読みこみ中…</strong></div>
-            <div><span>回る場所</span><strong>${trip.picks.length}か所</strong></div>`;
+            <div><span>回る場所</span><strong>${trip.picks.length}か所</strong></div>
+            ${plan.foodsLeft.length ? `<div><span>ごはん休憩に入りきらなかった名物</span><strong>${plan.foodsLeft.map((f) => esc(f.name)).join("・")}</strong></div>` : ""}`;
           showWeather();
           loadMapLibs().then(() => {
             if (!planMap) {
@@ -898,6 +1009,10 @@
           document.querySelectorAll(".plan-day").forEach((s) => s.classList.toggle("is-hidden-sm", Number(s.dataset.day) !== shownDay));
         });
         document.getElementById("print").addEventListener("click", () => window.print());
+        document.getElementById("plan-days").addEventListener("click", (e) => {
+          const b = e.target.closest("[data-info]");
+          if (b) openInfo(b.dataset.info);
+        });
 
         const drawPlanMap = (plan) => {
           planLayer.clearLayers();

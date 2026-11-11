@@ -13,7 +13,7 @@ window.yorimichiAddedSpots = [
   { id: "added-shimogamo", name: "下鴨神社（賀茂御祖神社）", area: "近畿・京都", category: "culture", group: "temple", lat: 35.03889, lng: 135.7725, source: "https://ja.wikipedia.org/wiki/賀茂御祖神社" },
   { id: "added-kamigamo", name: "上賀茂神社（賀茂別雷神社）", area: "近畿・京都", category: "culture", group: "temple", lat: 35.06028, lng: 135.75278, source: "https://ja.wikipedia.org/wiki/賀茂別雷神社" },
   { id: "added-gosho", name: "京都御所", area: "近畿・京都", category: "culture", group: "town", lat: 35.0253, lng: 135.7622, source: "https://ja.wikipedia.org/wiki/京都御所" },
-  { id: "added-nishiki", name: "錦市場", area: "近畿・京都", category: "culture", group: "town", lat: 35.005, lng: 135.765, source: "https://ja.wikipedia.org/wiki/錦市場" },
+  { id: "added-nishiki", name: "錦市場", area: "近畿・京都", category: "culture", group: "food", lat: 35.005, lng: 135.765, source: "https://ja.wikipedia.org/wiki/錦市場" },
   { id: "added-togetsukyo", name: "渡月橋", area: "近畿・京都", category: "nature", group: "nature", lat: 35.012806, lng: 135.677722, source: "https://ja.wikipedia.org/wiki/渡月橋" },
   { id: "added-tetsugaku", name: "哲学の道", area: "近畿・京都", category: "nature", group: "nature", lat: 35.0251278, lng: 135.796167, source: "https://ja.wikipedia.org/wiki/哲学の道" },
   { id: "added-sanzenin", name: "三千院", area: "近畿・京都", category: "culture", group: "temple", lat: 35.1198194, lng: 135.8344222, source: "https://ja.wikipedia.org/wiki/三千院" }
