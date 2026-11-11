@@ -994,9 +994,9 @@
     <header class="topbar">
       <a class="brand" href="index.html#top">
         <span class="brand-mark" aria-hidden="true">Y</span>
-        <span>YORIMICHI BIYORI</span>
+        <span>よりみち日和</span>
       </a>
-      <span class="topbar-note">JAPAN DAY TRIP · ITINERARY</span>
+      <span class="topbar-note">お出かけプラン</span>
     </header>
 
     <main>
@@ -1008,8 +1008,8 @@
         <a class="navigation-link" href="events.html">イベント一覧</a>
       </nav>
       <section class="hero" aria-labelledby="page-title">
-        <span class="success-chip" id="success-chip">PLAN GENERATED</span>
-        <p class="eyebrow">YOUR ROUTE IS READY</p>
+        <span class="success-chip" id="success-chip">できあがり</span>
+        <p class="eyebrow">このまま出かけられます</p>
         <h1 id="page-title">お出かけプランができました</h1>
         <p class="hero-copy" id="hero-copy">選んだ開始時刻と終了時刻に合わせて、立ち寄り先と食事休憩を含む行程をまとめました。</p>
         <div class="actions">
@@ -1053,7 +1053,7 @@
     </main>
 
     <footer>
-      <span>© YORIMICHI BIYORI</span>
+      <span>© よりみち日和</span>
       <span>移動時間・費用は計画用の目安です</span>
     </footer>
 
@@ -1211,7 +1211,7 @@
           const startTime = node("span", "time-badge", plan.startTime || formatClock(plan.startMinute));
           const startCopy = node("div", "node-copy");
           startCopy.append(
-            node("span", "node-kicker", "START"),
+            node("span", "node-kicker", "出発"),
             node("strong", "", plan.origin.name),
             node("small", "", `希望終了 ${formatClock(plan.endMinute)} · 移動手段 ${modeLabel}`)
           );
@@ -1245,7 +1245,7 @@
             const arrival = node("span", "time-badge", formatClock(stop.arrivalMinute));
             const panel = node("div", "stop-panel");
             panel.append(
-              node("span", "node-kicker", `STOP ${String(index + 1).padStart(2, "0")}`),
+              node("span", "node-kicker", `${index + 1}か所目`),
               node("h3", "stop-title", `${stop.emoji || "📍"} ${stop.name}`),
               node("p", "stop-meta", stop.area || "おすすめスポット")
             );
@@ -1267,7 +1267,7 @@
               const mealTime = node("span", "time-badge", formatClock(plan.meal.startMinute));
               const mealPanel = node("div", "stop-panel meal-panel");
               mealPanel.append(
-                node("span", "node-kicker", "MEAL BREAK"),
+                node("span", "node-kicker", "ごはん休憩"),
                 node("h3", "stop-title", `🍽️ ${plan.meal.label}`),
                 node("p", "stop-meta", `${plan.meal.nearbyName || stop.name} 周辺で食事休憩`)
               );
@@ -1295,7 +1295,7 @@
           if (!isPlanValid(plan)) throw new Error("Missing or invalid itinerary data");
           renderPlan(plan);
         } catch (error) {
-          document.getElementById("success-chip").textContent = "NO PLAN DATA";
+          document.getElementById("success-chip").textContent = "プランがありません";
           document.getElementById("page-title").textContent = "プランを読み込めません";
           document.getElementById("hero-copy").textContent =
             "プラン作成画面から出発地を設定し、時間内に回れる候補を選んで作成してください。";

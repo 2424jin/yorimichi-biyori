@@ -5047,6 +5047,7 @@
         let nearbyRequestController = null;
         let nearbyLoading = false;
         let visibleSpots = spots;
+        let spotListShowCount = 5;
         let spotListPage = 0;
         let spotListFilterKey = "";
         let realMap = null;
@@ -5614,10 +5615,12 @@
           if (filtersChanged) {
             spotListFilterKey = filterKey;
             spotListPage = 0;
+            spotListShowCount = 5;
           }
           const listScrollTop = filtersChanged ? 0 : list.scrollTop;
           let matches = spots.filter((spot) => {
             if (spot.id === currentLocationSpotId) return false;
+            if (selectedSpotKind === "all" && (spot.spotKind === "station" || spot.spotKind === "airport")) return false;
             const matchesCategory = selectedCategory === "all" || spot.category === selectedCategory;
             const matchesKind = selectedSpotKind === "all" || spot.spotKind === selectedSpotKind;
             const searchable = `${spot.name} ${spot.area} ${spot.categoryLabel} ${spotKindLabels[spot.spotKind] || ""}`.toLocaleLowerCase("ja");
@@ -5649,18 +5652,22 @@
           const pageStart = spotListPage * 100;
           visibleSpots = matches.slice(pageStart, pageStart + 100);
           list.replaceChildren();
-          visibleSpots.forEach((spot) => {
+          visibleSpots.forEach((spot, spotIndex) => {
             createFallbackMarker(spot);
             createRealMarker(spot);
+            if (spotIndex >= spotListShowCount) return;
             const button = document.createElement("button");
             button.className = "spot-card";
             button.type = "button";
             button.dataset.id = spot.id;
             button.setAttribute("aria-pressed", String(selectedSpot.id === spot.id));
             const distance = currentLocation ? distanceKm(currentLocation, spot) : null;
-            const distanceLabel = distance !== null
-              ? ` · 約${distance < 10 ? distance.toFixed(1) : Math.round(distance)} km · 所要時間目安 約${formatMinutes(estimateTravelMinutes(distance))}`
-              : "";
+            const travelModeNames = { transit: "電車・バス", driving: "車", walking: "歩き", bicycling: "自転車" };
+            const accessLabel = distance === null
+              ? spot.area
+              : distance <= 1.5
+                ? `歩いて約${Math.max(1, Math.round((distance * 1.25 / 4.5) * 60))}分`
+                : `約${distance < 10 ? distance.toFixed(1) : Math.round(distance)} km · ${travelModeNames[travelModeInput.value] || "移動"}で約${formatMinutes(estimateTravelMinutes(distance))}`;
             const icon = document.createElement("span");
             icon.className = "spot-emoji";
             icon.setAttribute("aria-hidden", "true");
@@ -5671,11 +5678,7 @@
             name.textContent = spot.name;
             const meta = document.createElement("span");
             meta.className = "spot-meta";
-            meta.append(
-              document.createTextNode(`${spot.area} · ${spotKindLabels[spot.spotKind] || "観光スポット"} · ${spot.categoryLabel}${distanceLabel}`),
-              document.createElement("br"),
-              document.createTextNode(`滞在 約${spot.stayMinutes}分 · 待ち時間 約${spot.waitMinutes}分`)
-            );
+            meta.textContent = `${spotKindLabels[spot.spotKind] || spot.categoryLabel || "観光スポット"} · ${accessLabel}`;
             copy.append(name, meta);
             const arrow = document.createElement("span");
             arrow.className = "spot-arrow";
@@ -5685,7 +5688,19 @@
             button.addEventListener("click", () => selectSpot(spot, true, true));
             list.append(button);
           });
-          if (pageCount > 1) {
+          const hiddenOnPage = Math.max(0, visibleSpots.length - spotListShowCount);
+          if (hiddenOnPage > 0) {
+            const moreButton = document.createElement("button");
+            moreButton.className = "spot-load-more spot-show-more";
+            moreButton.type = "button";
+            moreButton.textContent = `もっと見る（あと${(totalMatches - pageStart - spotListShowCount).toLocaleString("ja-JP")}件）`;
+            moreButton.addEventListener("click", () => {
+              spotListShowCount += 10;
+              renderSpots();
+            });
+            list.append(moreButton);
+          }
+          if (pageCount > 1 && hiddenOnPage === 0) {
             const pagination = document.createElement("div");
             pagination.className = "spot-pagination";
             if (spotListPage > 0) {
@@ -5719,14 +5734,12 @@
             list.append(pagination);
           }
           list.scrollTop = listScrollTop;
-          const resultSummary = totalMatches > 100
-            ? `${(pageStart + 1).toLocaleString("ja-JP")}–${(pageStart + visibleSpots.length).toLocaleString("ja-JP")}件 / ${totalMatches.toLocaleString("ja-JP")}件`
-            : `${totalMatches.toLocaleString("ja-JP")}件`;
+          const resultSummary = `${totalMatches.toLocaleString("ja-JP")}件`;
           if (currentLocation) {
             const rangeLabel = nearbySearchMode.value === "time"
               ? `${formatMinutes(Number(nearbyTime.value))}以内`
               : nearbyRadius.value === "all" ? "全国" : `${nearbyRadius.value} km以内`;
-            count.textContent = `${resultSummary} · ${nearbySearchMode.value === "time" ? "所要時間目安" : "距離順"} / ${rangeLabel}${nearbyLoading ? " · 追加取得中" : ""}`;
+            count.textContent = `${resultSummary}${nearbyLoading ? " · さがし中" : ""}`;
             emptyState.textContent = nearbySearchMode.value === "time"
               ? "選んだ時間内の候補がありません。時間・移動手段を変えてください。"
               : "選んだ距離内の候補がありません。範囲を広げるか、別の出発地を設定してください。";
@@ -6491,12 +6504,14 @@
               placeSearchCache.set(cacheKey, place);
             }
 
-            const insideJapan = setStartLocation(place.latitude, place.longitude, place.name, `${place.name}周辺`);
-            placeSearchNote.textContent = `「${place.name}」を中心に、近くのおすすめスポットを表示しています。検索データ：OpenStreetMap / Photon。`;
+            // 出発地の名前は、検索サービスの正式名ではなく、入れた言葉のまま出す
+            const placeLabel = query;
+            const insideJapan = setStartLocation(place.latitude, place.longitude, placeLabel, `${placeLabel}周辺`);
+            placeSearchNote.textContent = `「${placeLabel}」を中心に、近くのおすすめスポットを表示しています。検索データ：OpenStreetMap / Photon。`;
             setStatus(
               insideJapan
-                ? `「${place.name}」周辺のスポットを表示中`
-                : `「${place.name}」を検索しました。日本地図の表示範囲外です`,
+                ? `「${placeLabel}」から近い順に表示中`
+                : `「${placeLabel}」を検索しました。日本地図の表示範囲外です`,
               "ok"
             );
           } catch (error) {
