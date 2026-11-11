@@ -3484,6 +3484,308 @@
           box-shadow: 0 -6px 30px rgb(19 32 29 / 16%);
         }
       }
+      /* ===== 操作の改善B：最初に出発地を聞く（2026-11-11） ===== */
+      body.layout-b .b-origin {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 2px solid #2a5bd7;
+        border-radius: 16px;
+        background: #eef3fd;
+      }
+
+      body.layout-b .b-origin.is-empty {
+        border-style: dashed;
+        background: #fff;
+      }
+
+      body.layout-b .b-origin-icon {
+        display: flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #2a5bd7;
+        color: #fff;
+      }
+
+      body.layout-b .b-origin-text {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      body.layout-b .b-origin-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #2a5bd7;
+      }
+
+      body.layout-b .b-origin-name {
+        overflow: hidden;
+        font-size: 18px;
+        font-weight: 900;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      body.layout-b .b-origin.is-empty .b-origin-name {
+        font-size: 15px;
+        color: var(--b-muted);
+      }
+
+      body.layout-b .b-origin-change {
+        flex: none;
+        min-height: 44px;
+        padding: 0 14px;
+        border: 2px solid #2a5bd7;
+        border-radius: 12px;
+        background: #fff;
+        color: #2a5bd7;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      body.layout-b .b-origin.is-empty .b-origin-change {
+        background: #2a5bd7;
+        color: #fff;
+      }
+
+      body.layout-b .b-icon-button {
+        width: auto;
+        padding: 0 12px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      body.layout-b .b-brand {
+        flex: none;
+        white-space: nowrap;
+      }
+
+      body.layout-b .b-count {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      body.layout-b .b-search[hidden] {
+        display: none;
+      }
+
+      body.layout-b .b-status:empty {
+        display: none;
+      }
+
+      body.layout-b .b-status[data-state="error"] {
+        color: #b3401b;
+      }
+
+      body.layout-b .b-plan-hint {
+        text-align: center;
+      }
+
+      /* 最初の質問 */
+      body.layout-b .b-ask {
+        position: fixed;
+        z-index: 3000;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgb(19 32 29 / 45%);
+      }
+
+      body.layout-b .b-ask[hidden] {
+        display: none;
+      }
+
+      body.layout-b .b-ask-card {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        width: 100%;
+        max-width: 560px;
+        padding: 40px;
+        border-radius: 28px;
+        background: #fff;
+        box-shadow: 0 24px 60px rgb(19 32 29 / 35%);
+        color: var(--b-ink);
+      }
+
+      body.layout-b .b-ask-handle {
+        display: none;
+      }
+
+      body.layout-b .b-ask-head {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      body.layout-b .b-ask-brand {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--b-accent);
+      }
+
+      body.layout-b .b-ask-head h2 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 900;
+        line-height: 1.3;
+      }
+
+      body.layout-b .b-ask-head p {
+        margin: 0;
+        font-size: 15px;
+        color: var(--b-muted);
+      }
+
+      body.layout-b .b-ask-here {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 60px;
+        border: 0;
+        border-radius: 16px;
+        background: var(--b-accent);
+        color: #fff;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      body.layout-b .b-ask-here:disabled,
+      body.layout-b .b-ask-row button:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      body.layout-b .b-ask-or {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: var(--b-muted);
+      }
+
+      body.layout-b .b-ask-or span {
+        flex: 1;
+        height: 1px;
+        background: var(--b-line);
+      }
+
+      body.layout-b .b-ask-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      body.layout-b .b-ask-form label {
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      body.layout-b .b-ask-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      body.layout-b .b-ask-row input {
+        flex: 1;
+        min-width: 0;
+        height: 56px;
+        padding: 0 16px;
+        border: 2px solid var(--b-line);
+        border-radius: 14px;
+        font-size: 17px;
+      }
+
+      body.layout-b .b-ask-row button {
+        min-width: 88px;
+        height: 56px;
+        padding: 0 20px;
+        border: 0;
+        border-radius: 14px;
+        background: var(--b-ink);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      body.layout-b .b-ask-message {
+        margin: -8px 0 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: #b3401b;
+      }
+
+      body.layout-b .b-ask-message:empty {
+        display: none;
+      }
+
+      body.layout-b .b-ask-foot {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--b-muted);
+      }
+
+      body.layout-b .b-ask-skip {
+        min-height: 44px;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: #0f5c50;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      @media (max-width: 860px) {
+        body.layout-b .b-ask {
+          align-items: flex-end;
+          padding: 0;
+        }
+
+        body.layout-b .b-ask-card {
+          gap: 18px;
+          max-width: none;
+          padding: 12px 20px calc(24px + env(safe-area-inset-bottom));
+          border-radius: 28px 28px 0 0;
+        }
+
+        body.layout-b .b-ask-handle {
+          display: block;
+          align-self: center;
+          width: 44px;
+          height: 5px;
+          border-radius: 3px;
+          background: #c9d3cf;
+        }
+
+        body.layout-b .b-ask-head h2 {
+          font-size: 26px;
+        }
+
+        body.layout-b .b-ask-foot {
+          justify-content: center;
+          text-align: center;
+        }
+      }
     </style>
   </head>
   <body class="layout-b">
@@ -3538,7 +3840,18 @@
           <span class="b-count" id="result-count">スポットを表示</span>
         </div>
 
-        <form class="b-search" id="place-search-form">
+        <div class="b-origin" id="b-origin">
+          <span class="b-origin-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+          </span>
+          <span class="b-origin-text">
+            <span class="b-origin-label">出発地</span>
+            <span class="b-origin-name" id="b-origin-name">まだ決めていません</span>
+          </span>
+          <button class="b-origin-change" type="button" id="b-origin-change">決める</button>
+        </div>
+
+        <form class="b-search" id="place-search-form" hidden>
           <label class="b-visually-hidden" for="place-query">駅・空港・地名でさがす</label>
           <div class="b-search-row autocomplete-wrap">
             <span class="b-search-icon" aria-hidden="true">
@@ -3546,23 +3859,19 @@
             </span>
             <input id="place-query" type="search" placeholder="駅・空港・地名でさがす（例：京都駅）" aria-describedby="place-search-note" required>
             <div class="place-suggestions" id="place-query-suggestions" role="listbox" aria-label="場所の候補" hidden></div>
-            <button class="b-icon-button" id="place-search-button" type="submit" aria-label="周辺を検索">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-            </button>
-            <button class="b-icon-button b-accent" type="button" id="locate-button" aria-label="現在地を中心に表示">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
-            </button>
+            <button class="b-icon-button" id="place-search-button" type="submit">検索</button>
+            <button class="b-icon-button b-accent" type="button" id="locate-button">現在地</button>
           </div>
           <p class="b-note" id="place-search-note" role="status" aria-live="polite">
             場所の候補は <a href="https://photon.komoot.io/" target="_blank" rel="noopener noreferrer">Photon</a>（OpenStreetMapデータ）を使います。
           </p>
-          <div class="b-status location-status" id="location-status" role="status" aria-live="polite">
-            全国27,039か所の観光・余暇スポットを表示中
-          </div>
         </form>
+        <div class="b-status location-status" id="location-status" role="status" aria-live="polite">
+          全国27,039か所の観光・余暇スポットを表示中
+        </div>
 
         <div class="b-block">
-          <span class="b-label" id="b-range-label">範囲</span>
+          <span class="b-label" id="b-range-label">どこまで行く？</span>
           <div class="b-segment" role="group" aria-labelledby="b-range-label" id="b-range-chips">
             <button type="button" data-radius="20">20 km</button>
             <button type="button" data-radius="50">50 km</button>
@@ -3628,7 +3937,8 @@
         </details>
 
         <section class="b-block b-list-block" aria-labelledby="spot-heading">
-          <h1 class="b-heading" id="spot-heading">この近くの寄り道</h1>
+          <h1 class="b-heading" id="spot-heading">全国のおすすめ</h1>
+          <p class="b-note" id="b-list-hint">出発地を決めると、近い順に並びます。気になる所を押すと、地図で場所が分かります。</p>
           <p class="b-note" id="nearby-data-note" role="status" aria-live="polite">20 km以内のおすすめを距離順に表示します。条件はあとから変更できます。</p>
           <div class="spot-list" id="spot-list" aria-label="スポット一覧"></div>
           <div class="empty-state" id="empty-state">条件に合うスポットがありません。検索語やカテゴリを変えてみてください。</div>
@@ -3730,7 +4040,8 @@
               <p class="panel-note">地図で選んだスポットは最初の立ち寄り先として優先します。未選択なら検索範囲の近い候補から組み立て、3時間以上は45分の食事休憩を入れます。</p>
             </div>
           </details>
-          <button class="b-cta build-plan-button" id="build-plan" type="button" disabled>ここからプランを作る</button>
+          <button class="b-cta build-plan-button" id="build-plan" type="button" disabled aria-describedby="b-plan-hint">この寄り道でプランを作る</button>
+          <p class="b-note b-plan-hint" id="b-plan-hint">出発地を決めると押せます。</p>
           <div class="plan-result" id="plan-result" aria-live="polite">
             <p class="weather-message">現在地を取得するか、地図上のスポットを出発地にするとプランを作成できます。</p>
           </div>
@@ -3743,6 +4054,34 @@
           </span>
         </footer>
       </aside>
+
+      <div class="b-ask" id="b-ask" hidden>
+        <section class="b-ask-card" role="dialog" aria-modal="true" aria-labelledby="b-ask-title">
+          <div class="b-ask-handle" aria-hidden="true"></div>
+          <div class="b-ask-head">
+            <span class="b-ask-brand">よりみち日和</span>
+            <h2 id="b-ask-title">どこから出かけますか？</h2>
+            <p>出発地を決めると、近くの寄り道とプランが出ます。</p>
+          </div>
+          <button class="b-ask-here" type="button" id="b-ask-here">
+            <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
+            今いる場所から
+          </button>
+          <div class="b-ask-or" aria-hidden="true"><span></span>または<span></span></div>
+          <form class="b-ask-form" id="b-ask-form">
+            <label for="b-ask-place">駅・空港・地名を入れる</label>
+            <div class="b-ask-row">
+              <input id="b-ask-place" type="text" placeholder="例：京都駅、神戸空港" autocomplete="off">
+              <button type="submit" id="b-ask-submit">決める</button>
+            </div>
+          </form>
+          <p class="b-ask-message" id="b-ask-message" role="status" aria-live="polite"></p>
+          <div class="b-ask-foot">
+            <span>出発地は、あとからいつでも変えられます。</span>
+            <button type="button" class="b-ask-skip" id="b-ask-skip">先に全国のおすすめを見る</button>
+          </div>
+        </section>
+      </div>
     </div>
 
     <script src="wikidata-spots.js"></script>
@@ -5497,6 +5836,7 @@
           locationRequestId += 1;
           currentLocation = { lat: latitude, lng: longitude };
           currentLocationSpotId = spotId;
+          document.dispatchEvent(new CustomEvent("yorimichi:origin", { detail: { label: originLabel, weatherLabel } }));
           originInput.value = originLabel;
           originInput.dataset.routeValue = `${latitude},${longitude}`;
           refreshSelectedSpotMapLinks(selectedSpot);
@@ -5629,6 +5969,7 @@
         const requestCurrentLocation = () => {
           if (!navigator.geolocation) {
             setStatus("位置情報が使えません。スポットを選び「この場所を出発地にする」を押してください。", "error");
+            document.dispatchEvent(new CustomEvent("yorimichi:location-error", { detail: { message: "このブラウザーでは現在地が使えません。" } }));
             return;
           }
           const requestId = ++locationRequestId;
@@ -5657,11 +5998,12 @@
             (error) => {
               if (requestId !== locationRequestId) return;
               const messages = {
-                1: "位置情報の許可がありません。設定を確認するか、スポットを出発地に設定してください。",
+                1: "現在地は使えませんでした。駅や地名を入れて、出発地を決めてください。",
                 2: "現在地を取得できませんでした。スポットを出発地に設定してください。",
                 3: "現在地の確認がタイムアウトしました。もう一度お試しください。"
               };
               setStatus(messages[error.code] || "現在地を取得できませんでした。スポットを出発地に設定してください。", "error");
+              document.dispatchEvent(new CustomEvent("yorimichi:location-error", { detail: { message: messages[error.code] || "現在地を取得できませんでした。" } }));
             },
             { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
           );
@@ -6244,7 +6586,6 @@
         renderSpots();
         selectSpot(selectedSpot, false);
         loadRealMap();
-        requestCurrentLocation();
       })();
     </script>
     <script>
@@ -6278,6 +6619,176 @@
         document.addEventListener("click", () => setTimeout(sync, 0));
         setInterval(sync, 1000);
         sync();
+      })();
+    </script>
+    <script>
+      // 操作の改善B：最初に出発地を1つだけ聞く（2026-11-11）
+      (() => {
+        const ask = document.getElementById("b-ask");
+        const askHere = document.getElementById("b-ask-here");
+        const askForm = document.getElementById("b-ask-form");
+        const askInput = document.getElementById("b-ask-place");
+        const askSubmit = document.getElementById("b-ask-submit");
+        const askMessage = document.getElementById("b-ask-message");
+        const askSkip = document.getElementById("b-ask-skip");
+        const originBox = document.getElementById("b-origin");
+        const originName = document.getElementById("b-origin-name");
+        const originChange = document.getElementById("b-origin-change");
+        const heading = document.getElementById("spot-heading");
+        const listHint = document.getElementById("b-list-hint");
+        const planHint = document.getElementById("b-plan-hint");
+        const placeForm = document.getElementById("place-search-form");
+        const placeInput = document.getElementById("place-query");
+        const placeNote = document.getElementById("place-search-note");
+        const locateButton = document.getElementById("locate-button");
+        const radius = document.getElementById("nearby-radius");
+        const mode = document.getElementById("nearby-search-mode");
+        const time = document.getElementById("nearby-time");
+        const KEY = "yorimichi-origin-choice";
+        let originLabel = "";
+        let pendingLabel = "";
+        let waiting = false;
+
+        const store = (value) => {
+          try { sessionStorage.setItem(KEY, value); } catch (e) { /* 保存できなくても動く */ }
+        };
+        const load = () => {
+          try { return sessionStorage.getItem(KEY); } catch (e) { return null; }
+        };
+
+        const setBusy = (busy, text) => {
+          waiting = busy;
+          askHere.disabled = busy;
+          askSubmit.disabled = busy;
+          askMessage.style.color = busy ? "var(--b-muted)" : "";
+          askMessage.textContent = text || "";
+        };
+
+        const open = (message) => {
+          ask.hidden = false;
+          setBusy(false, message || "");
+          askInput.focus();
+        };
+        const close = () => {
+          ask.hidden = true;
+          setBusy(false, "");
+        };
+
+        const rangeText = () => {
+          if (mode && mode.value === "time") {
+            return `${time.options[time.selectedIndex].text}`;
+          }
+          return radius.value === "all" ? "全国" : `${radius.value} km以内`;
+        };
+
+        const refresh = () => {
+          const hasOrigin = Boolean(originLabel);
+          originBox.classList.toggle("is-empty", !hasOrigin);
+          originName.textContent = hasOrigin ? originLabel : "まだ決めていません";
+          originChange.textContent = hasOrigin ? "変える" : "決める";
+          if (hasOrigin) {
+            heading.textContent = radius.value === "all" && mode.value !== "time"
+              ? `${originLabel}から近い順（全国）`
+              : `${originLabel}から${rangeText()}の寄り道`;
+            listHint.textContent = "気になる所を押すと、地図で場所が分かります。";
+            planHint.textContent = "時刻や予算は「プランの時刻と予算」で変えられます。";
+          } else {
+            heading.textContent = "全国のおすすめ";
+            listHint.textContent = "出発地を決めると、近い順に並びます。気になる所を押すと、地図で場所が分かります。";
+            planHint.textContent = "出発地を決めると押せます。";
+          }
+        };
+
+        document.addEventListener("yorimichi:origin", (event) => {
+          const { label, weatherLabel } = event.detail || {};
+          originLabel = weatherLabel === "現在地周辺" ? "現在地" : (pendingLabel || label || "");
+          pendingLabel = "";
+          refresh();
+          if (!ask.hidden) close();
+        });
+
+        document.addEventListener("yorimichi:location-error", (event) => {
+          if (load() === "here") store("");
+          open((event.detail && event.detail.message) || "現在地は使えませんでした。駅や地名を入れてください。");
+        });
+
+        // 場所検索の結果（見つからない等）を、質問の画面にも出す
+        new MutationObserver(() => {
+          if (ask.hidden || !waiting) return;
+          const text = placeNote.textContent.trim();
+          if (/見つかりません|できませんでした|入力してください/.test(text)) {
+            pendingLabel = "";
+            setBusy(false, text);
+          }
+        }).observe(placeNote, { childList: true, characterData: true, subtree: true });
+
+        askHere.addEventListener("click", () => {
+          store("here");
+          setBusy(true, "現在地を確認しています…");
+          locateButton.click();
+        });
+
+        askForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const query = askInput.value.trim();
+          if (!query) {
+            askMessage.textContent = "駅・空港・地名を入れてください。";
+            askInput.focus();
+            return;
+          }
+          store(`place:${query}`);
+          pendingLabel = query;
+          setBusy(true, `「${query}」をさがしています…`);
+          placeInput.value = query;
+          placeForm.requestSubmit();
+        });
+
+        askSkip.addEventListener("click", () => {
+          store("skip");
+          close();
+        });
+
+        ask.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            store("skip");
+            close();
+          }
+        });
+
+        originChange.addEventListener("click", () => {
+          askInput.value = "";
+          open("");
+        });
+
+        [radius, mode, time].forEach((el) => el && el.addEventListener("change", refresh));
+        document.addEventListener("click", () => setTimeout(refresh, 0));
+        refresh();
+
+        // 同じタブで2回目からは聞かない（前の答えを使う）
+        const choice = load();
+        // 地図の読み込みを少し待ってから、前の答えで出発地を決め直す
+        const whenMapReady = (run) => {
+          const started = Date.now();
+          const tick = () => {
+            const label = document.getElementById("map-source-label");
+            const ready = label && label.textContent.includes("OpenFreeMap");
+            if (ready) setTimeout(run, 400);
+            else if (Date.now() - started > 8000) run();
+            else setTimeout(tick, 200);
+          };
+          tick();
+        };
+        if (choice === "here") {
+          whenMapReady(() => locateButton.click());
+        } else if (choice && choice.startsWith("place:")) {
+          whenMapReady(() => {
+            placeInput.value = choice.slice(6);
+            pendingLabel = choice.slice(6);
+            placeForm.requestSubmit();
+          });
+        } else if (choice !== "skip") {
+          open("");
+        }
       })();
     </script>
   </body>
