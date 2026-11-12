@@ -205,6 +205,7 @@
       .info-table { display: grid; grid-template-columns: 7em minmax(0, 1fr); gap: 8px 12px; margin: 0; font-size: 14px; }
       .info-table dt { font-weight: 700; color: var(--brown); }
       .info-table dd { margin: 0; }
+      .info-rank { display: inline-block; margin: 0 0 10px; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: #7a2511; font-size: 13px; font-weight: 700; }
       .info-pending { padding: 12px; border-radius: 12px; border: 2px dashed var(--line); color: var(--brown); font-size: 14px; }
       .info-list { margin: 0; padding-left: 20px; }
       .info-actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -393,11 +394,11 @@
       </div>
     </dialog>
 
-    <script src="spots-curated.js?v=20261112"></script>
-    <script src="wikidata-spots.js?v=20261112"></script>
-    <script src="spots-added.js?v=20261112"></script>
-    <script src="events.js?v=20261112"></script>
-    <script src="kyoto-info.js?v=20261112"></script>
+    <script src="spots-curated.js?v=20261112b"></script>
+    <script src="wikidata-spots.js?v=20261112b"></script>
+    <script src="spots-added.js?v=20261112b"></script>
+    <script src="events.js?v=20261112b"></script>
+    <script src="kyoto-info.js?v=20261112b"></script>
     <script>
       (() => {
         "use strict";
@@ -435,13 +436,18 @@
 
         const isTransport = (spot) => spot.spotKind === "station" || spot.spotKind === "airport" || spot.categoryLabel === "交通拠点";
         const seen = new Set();
+        const byName = new Map();
         const ALL = [];
         [window.yorimichiAddedSpots || [], window.yorimichiCuratedSpots || [], window.yorimichiWikidataSpots || []].forEach((source) => {
           source.forEach((spot) => {
             if (!Number.isFinite(spot.lat) || !Number.isFinite(spot.lng) || isTransport(spot)) return;
-            const key = spot.name.replace(/[（(].*$/, "") + "|" + spot.lat.toFixed(3) + "|" + spot.lng.toFixed(3);
-            if (seen.has(key) || seen.has(spot.id)) return;
-            seen.add(key);
+            // 同じ名前で1 km以内の物は、1つにまとめる（データの重なりをなくす）
+            const base = spot.name.replace(/[（(].*$/, "").trim();
+            if (seen.has(spot.id)) return;
+            const near = byName.get(base) || [];
+            if (near.some((p) => Math.abs(p.lat - spot.lat) < 0.01 && Math.abs(p.lng - spot.lng) < 0.012)) return;
+            near.push({ lat: spot.lat, lng: spot.lng });
+            byName.set(base, near);
             seen.add(spot.id);
             const profile = visitProfile(spot);
             ALL.push({ id: spot.id, name: spot.name, lat: spot.lat, lng: spot.lng, group: groupOf(spot), stay: profile.stay, cost: profile.cost, curated: !String(spot.id).startsWith("wikidata-") });
@@ -483,6 +489,8 @@
         const FOOD_BY_ID = new Map(FOODS.map((f) => [f.id, f]));
         trip.foods = (trip.foods || []).filter((id) => FOOD_BY_ID.has(id));
         const INFO = window.yorimichiSpotInfo || {};
+        const infoOf = (s) => INFO[s.name] || INFO[s.name.replace(/（.*$/, "")] || null;
+        const infoOrder = (s) => { const i = infoOf(s); return i && i.order ? i.order : 9999; };
         trip.picks = (trip.picks || []).filter((id) => BY_ID.has(id));
 
         // ===== 場所さがし（Photon） =====
@@ -674,12 +682,12 @@
           const items = filtered();
           const shown = items.slice(0, listLimit);
           listNote.textContent = items.length
-            ? `${trip.town.name}の中心から${RADIUS_KM} km以内に ${items.length.toLocaleString("ja-JP")}か所。手で選んだ場所から先に並べています。`
+            ? `${trip.town.name}の中心から${RADIUS_KM} km以内に ${items.length.toLocaleString("ja-JP")}か所。人気の場所（京都市の調査・口コミのランキング）から先に並べています。`
             : `${trip.town.name}の近くに、この条件の場所が見つかりません。種類を「すべて」にするか、名前を変えてください。`;
           listEl.innerHTML = shown.map((s) => {
             const on = trip.picks.includes(s.id);
             return `<li class="spot${on ? " is-in" : ""}">
-              <span class="spot-text"><button type="button" class="spot-name" data-focus="${esc(s.id)}">${esc(s.name)}</button><span class="spot-meta">${groupLabel(s.group)} · 滞在の目安 ${dur(s.stay)}</span></span>
+              <span class="spot-text"><button type="button" class="spot-name" data-focus="${esc(s.id)}">${esc(s.name)}</button><span class="spot-meta">${infoOf(s) && infoOf(s).rank ? "人気 · " : ""}${groupLabel(s.group)} · 滞在の目安 ${dur(s.stay)}</span></span>
               <button type="button" class="add" data-toggle="${esc(s.id)}" aria-pressed="${on}" aria-label="${esc(s.name)}を${on ? "しおりから外す" : "しおりに入れる"}">${on ? "✓" : "＋"}</button>
             </li>`;
           }).join("");
@@ -748,12 +756,14 @@
           const s = BY_ID.get(id);
           if (!s) return;
           infoId = id;
-          const info = INFO[s.name] || INFO[s.name.replace(/（.*$/, "")] || null;
+          const info = infoOf(s);
           document.getElementById("info-kind").textContent = groupLabel(s.group);
           document.getElementById("info-name").textContent = s.name;
           let html = "";
           if (info) {
+            if (info.rank) html += `<p class="info-rank">${esc(info.rank)}</p>`;
             if (info.summary) html += `<p style="margin: 0 0 12px;">${esc(info.summary)}</p>`;
+            if (info.note) html += `<p class="over" style="margin: 0 0 12px;">${esc(info.note)}</p>`;
             if (info.highlights && info.highlights.length) html += `<p style="margin: 0; font-weight: 700;">見どころ</p><ul class="info-list">${info.highlights.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>`;
           } else {
             html += `<p class="info-pending">くわしい説明・見どころは準備中です（調べ物のあとで足します）。</p>`;
@@ -765,7 +775,7 @@
           if (info && info.official) html += row("公式サイト", `<a href="${esc(info.official)}" target="_blank" rel="noopener noreferrer">公式サイトを開く ↗</a>`);
           if (info && info.sources && info.sources.length) html += row("出どころ", info.sources.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${i + 1}</a>`).join("・") + (info.checked ? `（${esc(info.checked)}に確認）` : ""));
           html += `</dl>`;
-          html += `<p class="note" style="margin-top: 10px;">時間や料金は変わることがあります。行く前に公式の情報で確かめてください。</p>`;
+          html += `<p class="note" style="margin-top: 10px;">時間や料金は変わることがあります。行く前に公式の情報で確かめてください。${info && info.rank ? "ランキングは京都市「令和7年 京都観光総合調査」とフォートラベルの口コミ（Geminiの調べ。場所ごとの順位は資料の本冊で未確認）。" : ""}</p>`;
           document.getElementById("info-body").innerHTML = html;
           const on = trip.picks.includes(id);
           const tg = document.getElementById("info-toggle");
@@ -816,7 +826,7 @@
             candidates = ALL
               .map((s) => ({ s, d: km(trip.town, s) }))
               .filter((x) => x.d <= RADIUS_KM)
-              .sort((a, b) => (b.s.curated - a.s.curated) || (a.d - b.d))
+              .sort((a, b) => (infoOrder(a.s) - infoOrder(b.s)) || (b.s.curated - a.s.curated) || (a.d - b.d))
               .map((x) => x.s);
             listLimit = LIST_STEP;
             renderEvents();

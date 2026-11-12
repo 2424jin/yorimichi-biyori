@@ -1,4 +1,4 @@
-// 足した観光地（2026-11-11）。元のデータに無かった京都の主な観光地。
+// 足した観光地（2026-11-11、11-12に高台寺と食べ歩きの場所を足した）。元のデータに無かった京都の主な観光地。
 // 位置（緯度・経度）は、それぞれの日本語版Wikipediaの記事に書かれた座標（source の記事）。
 window.yorimichiAddedSpots = [
   { id: "added-kinkakuji", name: "金閣寺（鹿苑寺）", area: "近畿・京都", category: "culture", group: "temple", lat: 35.0394028, lng: 135.7293639, source: "https://ja.wikipedia.org/wiki/鹿苑寺" },
@@ -16,5 +16,9 @@ window.yorimichiAddedSpots = [
   { id: "added-nishiki", name: "錦市場", area: "近畿・京都", category: "culture", group: "food", lat: 35.005, lng: 135.765, source: "https://ja.wikipedia.org/wiki/錦市場" },
   { id: "added-togetsukyo", name: "渡月橋", area: "近畿・京都", category: "nature", group: "nature", lat: 35.012806, lng: 135.677722, source: "https://ja.wikipedia.org/wiki/渡月橋" },
   { id: "added-tetsugaku", name: "哲学の道", area: "近畿・京都", category: "nature", group: "nature", lat: 35.0251278, lng: 135.796167, source: "https://ja.wikipedia.org/wiki/哲学の道" },
-  { id: "added-sanzenin", name: "三千院", area: "近畿・京都", category: "culture", group: "temple", lat: 35.1198194, lng: 135.8344222, source: "https://ja.wikipedia.org/wiki/三千院" }
+  { id: "added-sanzenin", name: "三千院", area: "近畿・京都", category: "culture", group: "temple", lat: 35.1198194, lng: 135.8344222, source: "https://ja.wikipedia.org/wiki/三千院" },
+  { id: "added-kodaiji", name: "高台寺", area: "近畿・京都", category: "culture", group: "temple", lat: 35.0007611, lng: 135.7811139, source: "https://ja.wikipedia.org/wiki/高台寺" },
+  { id: "added-sanneizaka", name: "産寧坂（清水寺の参道）", area: "近畿・京都", category: "culture", group: "food", lat: 34.996472, lng: 135.7809306, source: "https://ja.wikipedia.org/wiki/産寧坂" },
+  { id: "added-gion", name: "祇園", area: "近畿・京都", category: "culture", group: "food", lat: 35.003496, lng: 135.775051, source: "https://ja.wikipedia.org/wiki/祇園" },
+  { id: "added-otesuji", name: "伏見大手筋商店街", area: "近畿・京都", category: "culture", group: "food", lat: 34.93298, lng: 135.764, source: "https://ja.wikipedia.org/wiki/伏見大手筋商店街" }
 ];
