@@ -20,5 +20,25 @@ window.yorimichiAddedSpots = [
   { id: "added-kodaiji", name: "高台寺", area: "近畿・京都", category: "culture", group: "temple", lat: 35.0007611, lng: 135.7811139, source: "https://ja.wikipedia.org/wiki/高台寺" },
   { id: "added-sanneizaka", name: "産寧坂（清水寺の参道）", area: "近畿・京都", category: "culture", group: "food", lat: 34.996472, lng: 135.7809306, source: "https://ja.wikipedia.org/wiki/産寧坂" },
   { id: "added-gion", name: "祇園", area: "近畿・京都", category: "culture", group: "food", lat: 35.003496, lng: 135.775051, source: "https://ja.wikipedia.org/wiki/祇園" },
-  { id: "added-otesuji", name: "伏見大手筋商店街", area: "近畿・京都", category: "culture", group: "food", lat: 34.93298, lng: 135.764, source: "https://ja.wikipedia.org/wiki/伏見大手筋商店街" }
+  { id: "added-otesuji", name: "伏見大手筋商店街", area: "近畿・京都", category: "culture", group: "food", lat: 34.93298, lng: 135.764, source: "https://ja.wikipedia.org/wiki/伏見大手筋商店街" },
+  // ここから 20代向け（神社・お寺以外）。2026-11-25に足した。元：Gemini Deep Research（jinが実行）。
+  // 位置は OpenStreetMap のデータ（Photon・Nominatim で名前を検索して確かめた）。お店の中の場所は、入っている建物の位置。
+  { id: "y-soiree", name: "喫茶ソワレ", area: "近畿・京都", group: "cafe", lat: 35.00413, lng: 135.77031, stay: 60, cost: 1000, source: "https://www.openstreetmap.org/" },
+  { id: "y-walden", name: "Walden Woods Kyoto", area: "近畿・京都", group: "cafe", lat: 34.99335, lng: 135.76317, stay: 60, cost: 1000, source: "https://www.openstreetmap.org/" },
+  { id: "y-arabica", name: "% ARABICA 京都嵐山", area: "近畿・京都", group: "cafe", lat: 35.01354, lng: 135.67644, stay: 45, cost: 700, source: "https://www.openstreetmap.org/" },
+  { id: "y-tsujiri", name: "茶寮都路里 祇園本店", area: "近畿・京都", group: "cafe", lat: 35.0037, lng: 135.77448, stay: 60, cost: 1800, source: "https://www.openstreetmap.org/" },
+  { id: "y-rau", name: "RAU Patisserie & Chocolate", area: "近畿・京都", group: "cafe", lat: 35.00255, lng: 135.76859, stay: 60, cost: 1500, source: "https://www.openstreetmap.org/" },
+  { id: "y-fukunaga", name: "FUKUNAGA901", area: "近畿・京都", group: "cafe", lat: 34.98581, lng: 135.75698, stay: 60, cost: 1800, source: "https://www.openstreetmap.org/" },
+  { id: "y-shinpuhkan", name: "新風館", area: "近畿・京都", group: "shop", lat: 35.00967, lng: 135.76019, stay: 60, cost: 0, source: "https://www.openstreetmap.org/" },
+  { id: "y-t8", name: "京都髙島屋S.C.［T8］", area: "近畿・京都", group: "shop", lat: 35.00307, lng: 135.76843, stay: 90, cost: 0, source: "https://www.openstreetmap.org/" },
+  { id: "y-bal", name: "京都BAL", area: "近畿・京都", group: "shop", lat: 35.00679, lng: 135.76958, stay: 60, cost: 0, source: "https://www.openstreetmap.org/" },
+  { id: "y-gns", name: "GOOD NATURE STATION", area: "近畿・京都", group: "shop", lat: 35.00238, lng: 135.76911, stay: 45, cost: 0, source: "https://www.openstreetmap.org/" },
+  { id: "y-yumeyakata", name: "京都着物レンタル夢館 五条店", area: "近畿・京都", group: "exp", lat: 34.99641, lng: 135.76149, stay: 60, cost: 3080, source: "https://www.openstreetmap.org/" },
+  { id: "y-zuikogama", name: "瑞光窯 京都清水店", area: "近畿・京都", group: "exp", lat: 34.99836, lng: 135.77916, stay: 90, cost: 5390, source: "https://www.openstreetmap.org/" },
+  { id: "y-kanshundo", name: "甘春堂 東店（和菓子づくり体験）", area: "近畿・京都", group: "exp", lat: 34.99188, lng: 135.77068, stay: 75, cost: 2900, source: "https://www.openstreetmap.org/" },
+  { id: "y-kimono-forest", name: "キモノ・フォレスト（嵐電 嵐山駅）", area: "近畿・京都", group: "night", lat: 35.01522, lng: 135.6777, stay: 30, cost: 0, source: "https://www.openstreetmap.org/" },
+  { id: "y-station-stairs", name: "京都駅ビル 大階段", area: "近畿・京都", group: "night", lat: 34.98522, lng: 135.75829, stay: 30, cost: 0, source: "https://www.openstreetmap.org/" },
+  { id: "y-torokko", name: "嵯峨野トロッコ列車（トロッコ嵯峨駅）", area: "近畿・京都", group: "night", lat: 35.01859, lng: 135.68071, stay: 90, cost: 880, source: "https://www.openstreetmap.org/" },
+  { id: "y-incline", name: "蹴上インクライン", area: "近畿・京都", group: "night", lat: 35.00944, lng: 135.78962, stay: 30, cost: 0, source: "https://www.openstreetmap.org/" },
+  { id: "y-pontocho", name: "先斗町通", area: "近畿・京都", group: "night", lat: 35.00425, lng: 135.77121, stay: 45, cost: 0, source: "https://www.openstreetmap.org/" }
 ];

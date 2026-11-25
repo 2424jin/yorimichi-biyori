@@ -430,11 +430,11 @@
       </form>
     </dialog>
 
-    <script src="spots-curated.js?v=20261112b"></script>
-    <script src="wikidata-spots.js?v=20261112b"></script>
-    <script src="spots-added.js?v=20261112b"></script>
-    <script src="events.js?v=20261112b"></script>
-    <script src="kyoto-info.js?v=20261112b"></script>
+    <script src="spots-curated.js?v=20261125a"></script>
+    <script src="wikidata-spots.js?v=20261125a"></script>
+    <script src="spots-added.js?v=20261125a"></script>
+    <script src="events.js?v=20261125a"></script>
+    <script src="kyoto-info.js?v=20261125a"></script>
     <script>
       (() => {
         "use strict";
@@ -446,9 +446,13 @@
           { key: "nature", label: "自然・景色" },
           { key: "museum", label: "博物館・体験" },
           { key: "town", label: "街・名所" },
-          { key: "food", label: "食べる" }
+          { key: "food", label: "食べる" },
+          { key: "cafe", label: "カフェ・甘い物" },
+          { key: "shop", label: "買い物・街歩き" },
+          { key: "exp", label: "体験" },
+          { key: "night", label: "映え・夜" }
         ];
-        const groupLabel = (key) => (GROUPS.find((g) => g.key === key) || GROUPS[4]).label;
+        const groupLabel = (key) => (GROUPS.find((g) => g.key === key) || GROUPS.find((g) => g.key === "town")).label;
         const groupOf = (spot) => {
           if (spot.group) return spot.group;
           const name = spot.name;
@@ -486,7 +490,7 @@
             byName.set(base, near);
             seen.add(spot.id);
             const profile = visitProfile(spot);
-            ALL.push({ id: spot.id, name: spot.name, lat: spot.lat, lng: spot.lng, group: groupOf(spot), stay: profile.stay, cost: profile.cost, curated: !String(spot.id).startsWith("wikidata-") });
+            ALL.push({ id: spot.id, name: spot.name, lat: spot.lat, lng: spot.lng, group: groupOf(spot), stay: spot.stay || profile.stay, cost: Number.isFinite(spot.cost) ? spot.cost : profile.cost, curated: !String(spot.id).startsWith("wikidata-") });
           });
         });
         const BY_ID = new Map(ALL.map((s) => [s.id, s]));
@@ -817,11 +821,12 @@
           html += `<dl class="info-table" style="margin-top: 12px;">`;
           html += row("拝観・営業", info && info.hours ? esc(info.hours) : "未確認");
           html += row("料金（大人）", info && info.fee ? esc(info.fee) : "未確認");
+          if (info && info.event) html += row("夜のイベント", esc(info.event));
           html += row("見る時間", `目安 ${dur(s.stay)}`);
           if (info && info.official) html += row("公式サイト", `<a href="${esc(info.official)}" target="_blank" rel="noopener noreferrer">公式サイトを開く ↗</a>`);
-          if (info && info.sources && info.sources.length) html += row("出どころ", info.sources.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${i + 1}</a>`).join("・") + (info.checked ? `（${esc(info.checked)}に確認）` : ""));
+          if (info && info.sources && info.sources.length) html += row("出どころ", info.sources.map((u, i) => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${i + 1}</a>`).join("・") + (info.checked ? (/^\d{4}-\d\d-\d\d$/.test(info.checked) ? `（${esc(info.checked)}に確認）` : `（${esc(info.checked)}）`) : ""));
           html += `</dl>`;
-          html += `<p class="note" style="margin-top: 10px;">時間や料金は変わることがあります。行く前に公式の情報で確かめてください。${info && info.rank ? "ランキングは京都市「令和7年 京都観光総合調査」とフォートラベルの口コミ（Geminiの調べ。場所ごとの順位は資料の本冊で未確認）。" : ""}</p>`;
+          html += `<p class="note" style="margin-top: 10px;">時間や料金は変わることがあります。行く前に公式の情報で確かめてください。${info && info.rank ? "ランキングは京都市「令和7年 京都観光総合調査」とフォートラベルの口コミ（Geminiの調べ。場所ごとの順位は資料の本冊で未確認）。" : ""}${["cafe", "food"].includes(s.group) ? "食事や甘い物は、お店の中や決められた場所で（京都市「KYOTO TOURISTSHIP」）。" : ""}</p>`;
           document.getElementById("info-body").innerHTML = html;
           const on = trip.picks.includes(id);
           const tg = document.getElementById("info-toggle");
@@ -987,7 +992,8 @@
             // 時間を決めた場所は、その時刻に着くように入れる。ほかの場所は、間に合う物だけ先に回る
             const fixedAt = (sp) => { const f = (trip.fixed || {})[sp.id]; return f && f.day === d && f.at ? toMin(f.at) : null; };
             const fixedHere = route.filter((sp) => fixedAt(sp) !== null).sort((a, b) => fixedAt(a) - fixedAt(b));
-            const normal = route.filter((sp) => fixedAt(sp) === null);
+            // 「映え・夜」の場所は、その日の最後に回す
+            const normal = route.filter((sp) => fixedAt(sp) === null && sp.group !== "night").concat(route.filter((sp) => fixedAt(sp) === null && sp.group === "night"));
             const hadFixed = fixedHere.length > 0;
             const lunchAfter = (end) => (!lunchDone && end >= 11 * 60 + 30 && end <= 14 * 60 + 30 ? 60 : 0);
             const doStop = (sp, mustAt) => {
