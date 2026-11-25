@@ -186,6 +186,9 @@
       .free-box li { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
       .free-box li .sub { display: block; font-size: 12px; color: var(--brown); }
       .free-add { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 2px solid var(--accent); background: #fff; color: var(--accent); font-weight: 700; }
+      .fix-btn { margin-top: 4px; min-height: 32px; padding: 0 10px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card); color: var(--navy); font-size: 12px; font-weight: 700; align-self: flex-start; }
+      .fix-btn.is-set { border-color: var(--navy); background: var(--navy); color: #fff8ee; }
+      .late { display: block; margin-top: 4px; font-size: 12px; font-weight: 700; color: #a3290f; }
       .over { padding: 10px 12px; border-radius: 10px; background: #fff1d6; color: #6d4300; font-size: 13px; font-weight: 700; }
       .timeline { margin: 0; padding: 0; list-style: none; }
       .tl { display: grid; grid-template-columns: 64px 28px minmax(0, 1fr); gap: 12px; padding: 8px 0; align-items: start; }
@@ -297,6 +300,11 @@
               <label><span class="sr-only">おわり</span><input class="input" id="day-end" type="time" step="900" value="18:00"></label>
             </div>
           </div>
+          <div class="field">
+            <label for="day-return" style="font-weight: 700;">帰りの時刻（あれば）</label>
+            <input class="input" id="day-return" type="time" step="300">
+            <p class="note">最後の日に、着いた駅へもどっていたい時刻です（新幹線など）。空なら「おわり」の時刻までにもどります。</p>
+          </div>
           <p class="message" id="start-message" role="status" aria-live="polite"></p>
           <button class="btn-main btn-accent" type="submit" id="start-submit">行きたい場所を選ぶ →</button>
           <p class="note">町と駅の場所さがしには <a href="https://photon.komoot.io/" target="_blank" rel="noopener noreferrer">Photon</a>（OpenStreetMapのデータ）を使います。</p>
@@ -401,6 +409,25 @@
           <a class="btn" id="info-map" href="#" target="_blank" rel="noopener noreferrer">地図で見る ↗</a>
         </div>
       </div>
+    </dialog>
+
+    <dialog class="info-dialog" id="fix-dialog" aria-labelledby="fix-name">
+      <form class="info-inner" id="fix-form">
+        <div class="info-head">
+          <div>
+            <p class="info-kind">この時間にここにいる</p>
+            <h2 class="round" id="fix-name"></h2>
+          </div>
+          <button class="info-close" type="button" id="fix-close" aria-label="閉じる">×</button>
+        </div>
+        <label class="field"><span style="font-weight: 700;">何日目</span><select class="input" id="fix-day"></select></label>
+        <label class="field"><span style="font-weight: 700;">着いていたい時刻</span><input class="input" id="fix-at" type="time" step="300" required></label>
+        <p class="note">予約・チケット・待ち合わせの時刻など。プランをこの時刻に合わせて組み直します。早く着くときは「あき」の時間が出ます。</p>
+        <div class="info-actions">
+          <button class="btn-main btn-accent" type="submit" style="flex: 1 1 200px;">この時刻にする</button>
+          <button class="btn" type="button" id="fix-clear">決めた時刻をやめる</button>
+        </div>
+      </form>
     </dialog>
 
     <script src="spots-curated.js?v=20261112b"></script>
@@ -552,7 +579,7 @@
           if (b) go(b.dataset.go);
         });
         const daysLabel = (n) => (n === 1 ? "日帰り" : `${n - 1}泊${n}日`);
-        const tripText = () => `${trip.town ? trip.town.name : ""} · ${daysLabel(trip.days)}`;
+        const tripText = () => `${trip.town ? trip.town.name : ""} · ${daysLabel(trip.days)}${trip.ret ? ` · 帰り ${trip.ret}` : ""}`;
 
         // ===== ① 入口 =====
         const startForm = document.getElementById("start-form");
@@ -563,12 +590,14 @@
         const daysRow = document.getElementById("days-row");
         const dayStart = document.getElementById("day-start");
         const dayEnd = document.getElementById("day-end");
+        const dayReturn = document.getElementById("day-return");
         let chosenDays = trip.days;
         const renderStart = () => {
           townInput.value = trip.town ? trip.town.name : "";
           arriveInput.value = trip.arrive ? trip.arrive.name : "";
           dayStart.value = trip.start;
           dayEnd.value = trip.end;
+          dayReturn.value = trip.ret || "";
           chosenDays = trip.days;
           showDays();
         };
@@ -589,6 +618,7 @@
           const townName = townInput.value.trim();
           if (!townName) { startMsg.textContent = "行き先の町の名前を入れてください。"; townInput.focus(); return; }
           if (toMin(dayEnd.value) - toMin(dayStart.value) < 180) { startMsg.textContent = "動く時間は3時間以上にしてください。"; return; }
+          if (dayReturn.value && toMin(dayReturn.value) <= toMin(dayStart.value)) { startMsg.textContent = "帰りの時刻は、はじめの時刻より後にしてください。"; return; }
           startSubmit.disabled = true;
           startMsg.style.color = "var(--brown)";
           startMsg.textContent = `「${townName}」をさがしています…`;
@@ -608,6 +638,7 @@
             trip.days = chosenDays;
             trip.start = dayStart.value || "09:00";
             trip.end = dayEnd.value || "18:00";
+            trip.ret = dayReturn.value || "";
             save();
             startMsg.textContent = "";
             go("pick");
@@ -903,11 +934,19 @@
               from = next.c;
             }
             groups = ordered.concat(Array.from({ length: D - ordered.length }, () => []));
+            // 時間を決めた場所は、決めた日に入れる
+            const fixedAll = trip.fixed || {};
+            picks.forEach((p) => {
+              const f = fixedAll[p.id];
+              if (!f || !Number.isInteger(f.day) || f.day >= D) return;
+              groups = groups.map((g) => g.filter((x) => x !== p));
+              groups[f.day].push(p);
+            });
             // 「余った時間」から足した場所は、足したときに一緒だった場所と同じ日に入れる
             const withOf = trip.withOf || {};
             picks.forEach((p) => {
               const mate = BY_ID.get(withOf[p.id]);
-              if (!mate) return;
+              if (!mate || fixedAll[p.id]) return;
               const gi = groups.findIndex((g) => g.includes(mate));
               if (gi < 0 || groups[gi].includes(p)) return;
               groups = groups.map((g) => g.filter((x) => x !== p));
@@ -945,25 +984,55 @@
                 }
               }
             }
-            left.push(...route);
-            while (left.length) {
-              const s = left.shift();
-              const mv = move(here, s);
+            // 時間を決めた場所は、その時刻に着くように入れる。ほかの場所は、間に合う物だけ先に回る
+            const fixedAt = (sp) => { const f = (trip.fixed || {})[sp.id]; return f && f.day === d && f.at ? toMin(f.at) : null; };
+            const fixedHere = route.filter((sp) => fixedAt(sp) !== null).sort((a, b) => fixedAt(a) - fixedAt(b));
+            const normal = route.filter((sp) => fixedAt(sp) === null);
+            const hadFixed = fixedHere.length > 0;
+            const lunchAfter = (end) => (!lunchDone && end >= 11 * 60 + 30 && end <= 14 * 60 + 30 ? 60 : 0);
+            const doStop = (sp, mustAt) => {
+              const mv = move(here, sp);
               totalYen += mv.yen;
-              items.push({ type: "move", move: mv, from: here, to: s });
+              items.push({ type: "move", move: mv, from: here, to: sp });
               t += mv.minutes;
+              if (mustAt !== null && t < mustAt) {
+                items.push({ type: "wait", at: t, minutes: mustAt - t, place: sp, until: mustAt });
+                t = mustAt;
+              }
+              const late = mustAt !== null && t > mustAt ? t - mustAt : 0;
               const arriveAt = t;
-              t += s.stay;
-              totalYen += s.cost;
-              const st = { spot: s, arriveAt, leaveAt: t };
+              t += sp.stay;
+              totalYen += sp.cost;
+              const st = { spot: sp, arriveAt, leaveAt: t, fixedAt: mustAt, late };
               stops.push(st);
               items.push({ type: "stop", stop: st });
-              here = s;
-              if (!lunchDone && t >= 11 * 60 + 30 && t <= 14 * 60 + 30) {
-                items.push({ type: "meal", at: t, place: s, food: foodQueue.shift() || null });
+              here = sp;
+              if (lunchAfter(t)) {
+                items.push({ type: "meal", at: t, place: sp, food: foodQueue.shift() || null });
                 t += 60;
                 totalYen += 1200;
                 lunchDone = true;
+              }
+            };
+            while (normal.length || fixedHere.length) {
+              const F = fixedHere[0];
+              if (!F) {
+                // 時間を決めた場所のあとは、今いる所から近い順に回る
+                if (hadFixed) normal.sort((x, y) => km(here, x) - km(here, y));
+                doStop(normal.shift(), null);
+                continue;
+              }
+              const fAt = fixedAt(F);
+              const fit = normal
+                .map((sp) => { const end = t + move(here, sp).minutes + sp.stay; return { sp, ok: end + lunchAfter(end) + move(sp, F).minutes <= fAt, k: km(here, sp) }; })
+                .filter((x) => x.ok)
+                .sort((a, b) => a.k - b.k);
+              if (fit.length) {
+                normal.splice(normal.indexOf(fit[0].sp), 1);
+                doStop(fit[0].sp, null);
+              } else {
+                fixedHere.shift();
+                doStop(F, fAt);
               }
             }
             const last = d === D - 1;
@@ -977,7 +1046,8 @@
               items.push({ type: "hotel", place: here, label: `泊まる：${here.name}のあたり` });
             }
             from = here;
-            return { stops, items, endAt: t, free: Math.max(0, endMin - t), overMinutes: Math.max(0, t - endMin), lastPlace: here, isLast: last, lunchDone };
+            const limit = last && trip.ret ? toMin(trip.ret) : endMin;
+            return { stops, items, endAt: t, limit, free: Math.max(0, limit - t), overMinutes: Math.max(0, t - limit), lastPlace: here, isLast: last, lunchDone };
           });
           return { days, totalYen, foodsLeft: foodQueue };
         };
@@ -1019,7 +1089,7 @@
           }
           rows.push(`<li><span><strong>近くのカフェでひと休み</strong><span class="sub">${esc(idea.from.name)}のあたり（30分〜1時間）</span></span><a class="sub" href="${gmapsSearch("カフェ", idea.from)}" target="_blank" rel="noopener noreferrer">カフェをさがす ↗</a></li>`);
           const where = day.stops.length ? `${esc(idea.from.name)}のあと` : "この日";
-          return `<div class="free-box"><h3 class="round">あと約${dur(day.free)}あいています（${trip.end}まで）</h3><p class="note">${where}に、こんな使い方ができます。</p><ul>${rows.join("")}</ul></div>`;
+          return `<div class="free-box"><h3 class="round">あと約${dur(day.free)}あいています（${clock(day.limit)}${day.isLast && trip.ret ? "の帰り" : ""}まで）</h3><p class="note">${where}に、こんな使い方ができます。</p><ul>${rows.join("")}</ul></div>`;
         };
 
         // ===== ③ プラン =====
@@ -1044,7 +1114,10 @@
               if (it.type === "stop") {
                 num += 1;
                 const st = it.stop;
-                return `<li class="tl"><span class="tl-time">${clock(st.arriveAt)}</span><span class="tl-mark" style="background:${COLORS[d % COLORS.length]}">${num}</span><span class="tl-body"><button type="button" class="link-btn round" data-info="${esc(st.spot.id)}" style="font-size: 17px;">${esc(st.spot.name)}</button><span class="sub">${groupLabel(st.spot.group)} · 滞在の目安 ${dur(st.spot.stay)}（〜${clock(st.leaveAt)}）</span></span></li>`;
+                return `<li class="tl"><span class="tl-time">${clock(st.arriveAt)}</span><span class="tl-mark" style="background:${COLORS[d % COLORS.length]}">${num}</span><span class="tl-body"><button type="button" class="link-btn round" data-info="${esc(st.spot.id)}" style="font-size: 17px;">${esc(st.spot.name)}</button><span class="sub">${groupLabel(st.spot.group)} · 滞在の目安 ${dur(st.spot.stay)}（〜${clock(st.leaveAt)}）</span>${st.late ? `<span class="late">決めた時刻（${clock(st.fixedAt)}）に約${dur(st.late)}おくれます。前の場所を減らすか、時刻を見直してください。</span>` : ""}<button type="button" class="fix-btn${st.fixedAt !== null ? " is-set" : ""}" data-fix="${esc(st.spot.id)}">${st.fixedAt !== null ? `⏰ ${clock(st.fixedAt)}に着く（変える）` : "⏰ この時間にいる、を決める"}</button></span></li>`;
+              }
+              if (it.type === "wait") {
+                return `<li class="tl"><span class="tl-time">${clock(it.at)}</span><span class="tl-mark station">待</span><span class="tl-body"><strong>約${dur(it.minutes)}あき（${esc(it.place.name)}の${clock(it.until)}まで）</strong><a class="sub" href="${gmapsSearch("カフェ", it.place)}" target="_blank" rel="noopener noreferrer">近くのカフェをさがす ↗</a></span></li>`;
               }
               if (it.type === "meal") {
                 const food = it.food;
@@ -1059,7 +1132,8 @@
             }).join("");
             const head = trip.days === 1 ? "この日" : `${d + 1}日目`;
             const empty = day.stops.length ? "" : `<p class="note">この日に入る場所がありません。「場所を足す・減らす」から足してください。</p>`;
-            const over = day.overMinutes > 0 ? `<p class="over">終わりの時刻（${trip.end}）を${dur(day.overMinutes)}こえます。場所を減らすか、日数をふやしてください。</p>` : "";
+            const overWhat = day.isLast && trip.ret ? "帰りの時刻" : "終わりの時刻";
+            const over = day.overMinutes > 0 ? `<p class="over">${overWhat}（${clock(day.limit)}）を${dur(day.overMinutes)}こえます。場所を減らすか、日数をふやしてください。</p>` : "";
             return `<section class="plan-day${d === shownDay ? "" : " is-hidden-sm"}" data-day="${d}"><h2 class="round">${head}<small>${day.stops.length}か所 · ${clock(toMin(trip.start))}〜${clock(day.endAt)}</small></h2>${over}<ol class="timeline">${rows}</ol>${empty}${freeBox(day, plan.foodsLeft, usedIdeas)}</section>`;
           }).join("");
           document.getElementById("summary").innerHTML = `
@@ -1085,7 +1159,47 @@
           document.querySelectorAll(".plan-day").forEach((s) => s.classList.toggle("is-hidden-sm", Number(s.dataset.day) !== shownDay));
         });
         document.getElementById("print").addEventListener("click", () => window.print());
+        // ===== この時間にここにいる =====
+        const fixDlg = document.getElementById("fix-dialog");
+        const fixDay = document.getElementById("fix-day");
+        const fixAt = document.getElementById("fix-at");
+        let fixId = null;
+        const closeFix = () => { if (typeof fixDlg.close === "function") fixDlg.close(); else fixDlg.removeAttribute("open"); };
+        const openFix = (id, curDay) => {
+          const s = BY_ID.get(id);
+          if (!s) return;
+          fixId = id;
+          const f = (trip.fixed || {})[id];
+          document.getElementById("fix-name").textContent = s.name;
+          fixDay.innerHTML = Array.from({ length: trip.days }, (_, i) => `<option value="${i}">${trip.days === 1 ? "この日" : `${i + 1}日目`}</option>`).join("");
+          fixDay.value = String(f && f.day < trip.days ? f.day : curDay);
+          fixAt.value = f ? f.at : "13:00";
+          document.getElementById("fix-clear").hidden = !f;
+          if (typeof fixDlg.showModal === "function") fixDlg.showModal(); else fixDlg.setAttribute("open", "");
+        };
+        document.getElementById("fix-form").addEventListener("submit", (e) => {
+          e.preventDefault();
+          if (!fixId || !fixAt.value) return;
+          trip.fixed = Object.assign({}, trip.fixed, { [fixId]: { day: Number(fixDay.value), at: fixAt.value } });
+          save();
+          closeFix();
+          shownDay = Number(fixDay.value);
+          renderPlan();
+        });
+        document.getElementById("fix-clear").addEventListener("click", () => {
+          const f = Object.assign({}, trip.fixed);
+          delete f[fixId];
+          trip.fixed = f;
+          save();
+          closeFix();
+          renderPlan();
+        });
+        document.getElementById("fix-close").addEventListener("click", closeFix);
+        fixDlg.addEventListener("click", (e) => { if (e.target === fixDlg) closeFix(); });
+
         document.getElementById("plan-days").addEventListener("click", (e) => {
+          const fx = e.target.closest("[data-fix]");
+          if (fx) { openFix(fx.dataset.fix, Number(fx.closest(".plan-day").dataset.day)); return; }
           const add = e.target.closest("[data-add]");
           if (add) {
             if (!trip.picks.includes(add.dataset.add)) trip.picks.push(add.dataset.add);
