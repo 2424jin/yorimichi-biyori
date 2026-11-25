@@ -96,9 +96,11 @@
       }
       .start-form .q { font-family: "Zen Maru Gothic", sans-serif; font-weight: 900; font-size: 20px; }
       .days { margin: 0; padding: 0; border: 0; }
-      .days-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-      .days-row button { min-height: 52px; border-radius: 14px; border: 2px solid var(--navy); background: #fff; font-weight: 700; font-size: 16px; }
-      .days-row button[aria-pressed="true"] { background: var(--navy); color: #fff8ee; }
+      .days-row { display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; gap: 8px; align-items: center; }
+      .days-row button { min-height: 52px; border-radius: 14px; border: 2px solid var(--navy); background: #fff; font-weight: 900; font-size: 24px; line-height: 1; }
+      .days-row button:disabled { opacity: .35; cursor: not-allowed; }
+      .days-row output { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: var(--navy); color: #fff8ee; font-weight: 700; font-size: 18px; }
+      .days-hint { margin: 6px 0 0; font-size: 13px; color: var(--brown); }
       .time-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
       .time-row .input { height: 48px; font-size: 16px; }
 
@@ -178,6 +180,12 @@
       .plan-day { display: flex; flex-direction: column; gap: 8px; }
       .plan-day h2 { margin: 0; font-size: 22px; color: var(--navy); display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
       .plan-day h2 small { font-family: "Zen Kaku Gothic New", sans-serif; font-size: 13px; font-weight: 700; color: var(--brown); }
+      .free-box { padding: 14px; border-radius: 14px; border: 2px dashed var(--navy); background: #fffdf8; display: flex; flex-direction: column; gap: 10px; }
+      .free-box h3 { margin: 0; font-size: 16px; }
+      .free-box ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+      .free-box li { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+      .free-box li .sub { display: block; font-size: 12px; color: var(--brown); }
+      .free-add { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 2px solid var(--accent); background: #fff; color: var(--accent); font-weight: 700; }
       .over { padding: 10px 12px; border-radius: 10px; background: #fff1d6; color: #6d4300; font-size: 13px; font-weight: 700; }
       .timeline { margin: 0; padding: 0; list-style: none; }
       .tl { display: grid; grid-template-columns: 64px 28px minmax(0, 1fr); gap: 12px; padding: 8px 0; align-items: start; }
@@ -237,8 +245,8 @@
         .plan-body { display: flex; flex-direction: column; }
         .plan-map-col { position: relative; height: 38vh; min-height: 260px; order: 1; }
         .plan-sheet { order: 2; padding: 20px 16px 48px; }
-        .day-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; padding: 4px; border-radius: 12px; background: var(--paper); }
-        .day-tabs button { min-height: 44px; border: 0; border-radius: 9px; background: transparent; font-weight: 700; }
+        .day-tabs { display: flex; gap: 6px; padding: 4px; border-radius: 12px; background: var(--paper); overflow-x: auto; }
+        .day-tabs button { flex: 1 0 64px; min-height: 44px; border: 0; border-radius: 9px; background: transparent; font-weight: 700; }
         .day-tabs button[aria-pressed="true"] { background: var(--navy); color: #fff8ee; }
         .plan-day.is-hidden-sm { display: none; }
       }
@@ -272,10 +280,11 @@
           <fieldset class="days field">
             <legend class="q">何日？</legend>
             <div class="days-row" id="days-row">
-              <button type="button" data-days="1" aria-pressed="false">日帰り</button>
-              <button type="button" data-days="2" aria-pressed="true">1泊2日</button>
-              <button type="button" data-days="3" aria-pressed="false">2泊3日</button>
+              <button type="button" data-step="-1" aria-label="1日へらす">−</button>
+              <output id="days-out" aria-live="polite">1泊2日</output>
+              <button type="button" data-step="1" aria-label="1日ふやす">＋</button>
             </div>
+            <p class="days-hint">日帰りから6泊7日まで選べます。</p>
           </fieldset>
           <div class="field">
             <label for="arrive">着く駅・空港（あとで決めてもよい）</label>
@@ -561,13 +570,19 @@
           dayStart.value = trip.start;
           dayEnd.value = trip.end;
           chosenDays = trip.days;
-          daysRow.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(Number(b.dataset.days) === chosenDays)));
+          showDays();
+        };
+        const MAX_DAYS = 7;
+        const showDays = () => {
+          document.getElementById("days-out").textContent = daysLabel(chosenDays);
+          daysRow.querySelector('[data-step="-1"]').disabled = chosenDays <= 1;
+          daysRow.querySelector('[data-step="1"]').disabled = chosenDays >= MAX_DAYS;
         };
         daysRow.addEventListener("click", (e) => {
           const b = e.target.closest("button");
           if (!b) return;
-          chosenDays = Number(b.dataset.days);
-          daysRow.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+          chosenDays = Math.min(MAX_DAYS, Math.max(1, chosenDays + Number(b.dataset.step)));
+          showDays();
         });
         startForm.addEventListener("submit", async (e) => {
           e.preventDefault();
@@ -888,6 +903,16 @@
               from = next.c;
             }
             groups = ordered.concat(Array.from({ length: D - ordered.length }, () => []));
+            // 「余った時間」から足した場所は、足したときに一緒だった場所と同じ日に入れる
+            const withOf = trip.withOf || {};
+            picks.forEach((p) => {
+              const mate = BY_ID.get(withOf[p.id]);
+              if (!mate) return;
+              const gi = groups.findIndex((g) => g.includes(mate));
+              if (gi < 0 || groups[gi].includes(p)) return;
+              groups = groups.map((g) => g.filter((x) => x !== p));
+              groups[gi].push(p);
+            });
           }
           // 3. 日ごとに、近い順に回り、時刻をつける
           let from = base;
@@ -952,16 +977,56 @@
               items.push({ type: "hotel", place: here, label: `泊まる：${here.name}のあたり` });
             }
             from = here;
-            return { stops, items, endAt: t, free: Math.max(0, endMin - t), overMinutes: Math.max(0, t - endMin) };
+            return { stops, items, endAt: t, free: Math.max(0, endMin - t), overMinutes: Math.max(0, t - endMin), lastPlace: here, isLast: last, lunchDone };
           });
           return { days, totalYen, foodsLeft: foodQueue };
+        };
+
+        // ===== 余った時間の使い方の提案 =====
+        const FREE_MIN = 60; // 1時間以上あいたら提案する
+        const freeIdeas = (day, foodsLeft, used) => {
+          const base = trip.arrive || trip.town;
+          const from = day.lastPlace || base;
+          const picked = new Set(trip.picks);
+          const spots = ALL
+            .filter((s) => !picked.has(s.id) && !used.has(s.id) && km(trip.town, s) <= RADIUS_KM && km(from, s) <= 6)
+            .map((s) => {
+              const go = move(from, s);
+              const back = day.isLast ? move(s, base).minutes - (day.stops.length ? move(from, base).minutes : 0) : 0;
+              return { s, go, need: go.minutes + s.stay + Math.max(0, back) };
+            })
+            .filter((x) => x.need <= day.free)
+            // 近い所を先に。人気（くわしい情報あり）・元のデータの場所は少し前に出す
+            .map((x) => ({ ...x, score: x.go.minutes + (infoOrder(x.s) < 9999 ? 0 : 15) + (x.s.curated ? 0 : 10) }))
+            .sort((a, b) => a.score - b.score);
+          // 種類がばらけるように選ぶ（同じ種類は2つ目から後ろへ）
+          const groupsSeen = new Set();
+          const pickedIdeas = [];
+          spots.forEach((x) => { if (pickedIdeas.length < 3 && !groupsSeen.has(x.s.group)) { groupsSeen.add(x.s.group); pickedIdeas.push(x); } });
+          spots.forEach((x) => { if (pickedIdeas.length < 3 && !pickedIdeas.includes(x)) pickedIdeas.push(x); });
+          pickedIdeas.sort((a, b) => a.score - b.score);
+          pickedIdeas.forEach((x) => used.add(x.s.id));
+          spots.length = 0;
+          spots.push(...pickedIdeas);
+          return { from, spots, food: foodsLeft[0] || null };
+        };
+        const freeBox = (day, foodsLeft, used) => {
+          if (day.free < FREE_MIN) return "";
+          const idea = freeIdeas(day, foodsLeft, used);
+          const rows = idea.spots.map((x) => `<li><span><button type="button" class="link-btn" data-info="${esc(x.s.id)}">${esc(x.s.name)}</button><span class="sub">${groupLabel(x.s.group)} · ${x.go.label}で約${dur(x.go.minutes)} · 滞在の目安 ${dur(x.s.stay)}</span></span><button type="button" class="free-add" data-add="${esc(x.s.id)}" data-with="${day.stops.length ? esc(day.stops[day.stops.length - 1].spot.id) : ""}">＋ 足す</button></li>`);
+          if (idea.food && day.free >= 60) {
+            rows.push(`<li><span><strong>名物の${esc(idea.food.name)}を食べる</strong><span class="sub">ごはん休憩に入りきらなかった名物です（約1時間）</span></span><a class="sub" href="${gmapsSearch(idea.food.name, idea.from)}" target="_blank" rel="noopener noreferrer">近くのお店をさがす ↗</a></li>`);
+          }
+          rows.push(`<li><span><strong>近くのカフェでひと休み</strong><span class="sub">${esc(idea.from.name)}のあたり（30分〜1時間）</span></span><a class="sub" href="${gmapsSearch("カフェ", idea.from)}" target="_blank" rel="noopener noreferrer">カフェをさがす ↗</a></li>`);
+          const where = day.stops.length ? `${esc(idea.from.name)}のあと` : "この日";
+          return `<div class="free-box"><h3 class="round">あと約${dur(day.free)}あいています（${trip.end}まで）</h3><p class="note">${where}に、こんな使い方ができます。</p><ul>${rows.join("")}</ul></div>`;
         };
 
         // ===== ③ プラン =====
         let planMap = null;
         let planLayer = null;
         let shownDay = 0;
-        const COLORS = ["#b23a1c", "#1f6f5c", "#2a5bd7"];
+        const COLORS = ["#b23a1c", "#1f6f5c", "#2a5bd7", "#8a4fbf", "#c98a00", "#d4447a", "#2f8f9d"];
         const renderPlan = () => {
           document.getElementById("plan-trip").textContent = tripText();
           document.getElementById("plan-title").textContent = `${trip.town.name} ${daysLabel(trip.days)}のプラン`;
@@ -970,6 +1035,7 @@
           const tabs = document.getElementById("day-tabs");
           tabs.innerHTML = trip.days > 1 ? plan.days.map((_, d) => `<button type="button" data-day="${d}" aria-pressed="${d === shownDay}">${d + 1}日目</button>`).join("") : "";
           let num = 0;
+          const usedIdeas = new Set();
           document.getElementById("plan-days").innerHTML = plan.days.map((day, d) => {
             const rows = day.items.map((it) => {
               if (it.type === "move") {
@@ -978,7 +1044,7 @@
               if (it.type === "stop") {
                 num += 1;
                 const st = it.stop;
-                return `<li class="tl"><span class="tl-time">${clock(st.arriveAt)}</span><span class="tl-mark" style="background:${COLORS[d % 3]}">${num}</span><span class="tl-body"><button type="button" class="link-btn round" data-info="${esc(st.spot.id)}" style="font-size: 17px;">${esc(st.spot.name)}</button><span class="sub">${groupLabel(st.spot.group)} · 滞在の目安 ${dur(st.spot.stay)}（〜${clock(st.leaveAt)}）</span></span></li>`;
+                return `<li class="tl"><span class="tl-time">${clock(st.arriveAt)}</span><span class="tl-mark" style="background:${COLORS[d % COLORS.length]}">${num}</span><span class="tl-body"><button type="button" class="link-btn round" data-info="${esc(st.spot.id)}" style="font-size: 17px;">${esc(st.spot.name)}</button><span class="sub">${groupLabel(st.spot.group)} · 滞在の目安 ${dur(st.spot.stay)}（〜${clock(st.leaveAt)}）</span></span></li>`;
               }
               if (it.type === "meal") {
                 const food = it.food;
@@ -994,7 +1060,7 @@
             const head = trip.days === 1 ? "この日" : `${d + 1}日目`;
             const empty = day.stops.length ? "" : `<p class="note">この日に入る場所がありません。「場所を足す・減らす」から足してください。</p>`;
             const over = day.overMinutes > 0 ? `<p class="over">終わりの時刻（${trip.end}）を${dur(day.overMinutes)}こえます。場所を減らすか、日数をふやしてください。</p>` : "";
-            return `<section class="plan-day${d === shownDay ? "" : " is-hidden-sm"}" data-day="${d}"><h2 class="round">${head}<small>${day.stops.length}か所 · ${clock(toMin(trip.start))}〜${clock(day.endAt)}</small></h2>${over}<ol class="timeline">${rows}</ol>${empty}</section>`;
+            return `<section class="plan-day${d === shownDay ? "" : " is-hidden-sm"}" data-day="${d}"><h2 class="round">${head}<small>${day.stops.length}か所 · ${clock(toMin(trip.start))}〜${clock(day.endAt)}</small></h2>${over}<ol class="timeline">${rows}</ol>${empty}${freeBox(day, plan.foodsLeft, usedIdeas)}</section>`;
           }).join("");
           document.getElementById("summary").innerHTML = `
             <div><span>費用の目安（1人・宿代は入れない）</span><strong>${yen(plan.totalYen)}</strong></div>
@@ -1020,6 +1086,14 @@
         });
         document.getElementById("print").addEventListener("click", () => window.print());
         document.getElementById("plan-days").addEventListener("click", (e) => {
+          const add = e.target.closest("[data-add]");
+          if (add) {
+            if (!trip.picks.includes(add.dataset.add)) trip.picks.push(add.dataset.add);
+            if (add.dataset.with) trip.withOf = Object.assign({}, trip.withOf, { [add.dataset.add]: add.dataset.with });
+            save();
+            renderPlan();
+            return;
+          }
           const b = e.target.closest("[data-info]");
           if (b) openInfo(b.dataset.info);
         });
@@ -1036,11 +1110,11 @@
               if (it.type === "stop") {
                 num += 1;
                 const s = it.stop.spot;
-                L.marker([s.lat, s.lng], { icon: numIcon(num, `background:${COLORS[d % 3]}`), title: s.name }).bindTooltip(`${d + 1}日目 ${s.name}`).addTo(planLayer);
+                L.marker([s.lat, s.lng], { icon: numIcon(num, `background:${COLORS[d % COLORS.length]}`), title: s.name }).bindTooltip(`${d + 1}日目 ${s.name}`).addTo(planLayer);
                 pts.push([s.lat, s.lng]);
               }
             });
-            if (line.length) L.polyline(line, { color: COLORS[d % 3], weight: 4, dashArray: "8 8" }).addTo(planLayer);
+            if (line.length) L.polyline(line, { color: COLORS[d % COLORS.length], weight: 4, dashArray: "8 8" }).addTo(planLayer);
           });
           L.circleMarker([base.lat, base.lng], { radius: 9, color: "#fff", weight: 3, fillColor: "#1f3a5f", fillOpacity: 1 }).bindTooltip(trip.arrive ? trip.arrive.name : `${trip.town.name}の中心`).addTo(planLayer);
           pts.push([base.lat, base.lng]);
