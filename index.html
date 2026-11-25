@@ -244,7 +244,9 @@
         .map-col { order: 1; height: 42vh; min-height: 280px; }
         .col-list { order: 2; max-height: none; overflow: visible; border-right: 0; padding: 16px; }
         .col-book { order: 3; padding: 16px 16px 96px; }
-        .book-cta { position: fixed; z-index: 1000; left: 12px; right: 12px; bottom: 12px; box-shadow: 0 6px 20px rgb(31 58 95 / 35%); }
+        .book-cta { position: fixed; z-index: 1000; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); box-shadow: 0 0 0 12px var(--paper), 0 -10px 16px 8px var(--paper); }
+        /* まだ1か所も選んでいないときは、下のボタンを出さない（一覧の文字に重なるため） */
+        .book-cta:disabled { display: none; }
         .plan-body { display: flex; flex-direction: column; }
         .plan-map-col { position: relative; height: 38vh; min-height: 260px; order: 1; }
         .plan-sheet { order: 2; padding: 20px 16px 48px; }
