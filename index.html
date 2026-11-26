@@ -103,6 +103,10 @@
       .days-hint { margin: 6px 0 0; font-size: 13px; color: var(--brown); }
       .time-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
       .time-row .input { height: 48px; font-size: 16px; }
+      .time-row label { display: block; min-width: 0; }
+      /* iPhone（Safari）の時刻の欄は、そのままだと枠からはみ出すため、幅を枠に合わせる */
+      input[type="time"].input { -webkit-appearance: none; appearance: none; display: block; min-width: 0; max-width: 100%; line-height: 1.2; }
+      input[type="time"].input::-webkit-date-and-time-value { text-align: center; }
 
       /* ② 選ぶ */
       .pick { min-height: 100vh; display: flex; flex-direction: column; }
