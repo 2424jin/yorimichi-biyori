@@ -102,11 +102,13 @@
       .days-row output { display: grid; place-items: center; min-height: 52px; border-radius: 14px; background: var(--navy); color: #fff8ee; font-weight: 700; font-size: 18px; }
       .days-hint { margin: 6px 0 0; font-size: 13px; color: var(--brown); }
       .time-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-      .time-row .input { height: 48px; font-size: 16px; }
+      .time-row .input { font-size: 16px; }
       .time-row label { display: block; min-width: 0; }
       /* iPhone（Safari）の時刻の欄は、そのままだと枠からはみ出すため、幅を枠に合わせる */
-      input[type="time"].input { -webkit-appearance: none; appearance: none; display: block; min-width: 0; max-width: 100%; line-height: 1.2; }
-      input[type="time"].input::-webkit-date-and-time-value { text-align: center; }
+      /* 上下の余白が0だと、iPhoneでは数字が枠の上に寄るため、余白で真ん中に置く（54px＝文字20＋余白15×2＋線2×2） */
+      input[type="time"].input { -webkit-appearance: none; appearance: none; display: block; min-width: 0; max-width: 100%; height: 54px; padding: 15px 16px; line-height: 20px; overflow: hidden; }
+      .time-row input[type="time"].input { height: 48px; padding-block: 12px; }
+      input[type="time"].input::-webkit-date-and-time-value { text-align: center; line-height: 20px; min-height: 20px; margin: 0; }
 
       /* ② 選ぶ */
       .pick { min-height: 100vh; display: flex; flex-direction: column; }
