@@ -12,7 +12,7 @@
 ## ファイル
 - `index.html`：サイト本体（3つの画面）
 - `spots-curated.js`：手で選んだ観光地
-- `wikidata-spots.js`：Wikidata（CC0）から集めた観光地
+- `wikidata-spots-lite.js`：Wikidata（CC0）から集めた観光地（使う項目だけの軽い版。元の全部入りは `過去の版/2026-11-26_wikidata-spots_full.js`）
 - `spots-added.js`：足した京都の観光地（位置は日本語版Wikipediaの座標。記事のURLを各行に記録）
 - `events.js`：例年のイベントの目安
 - `過去の版/`：作り直す前のページ（2026-11-11）
